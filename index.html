@@ -220,6 +220,20 @@
     margin-top: 16px;
     margin-bottom: 8px;
   }
+
+  /* 위치 상태 */
+  .location-status {
+    text-align: center;
+    font-size: 11px;
+    margin: 0 auto 12px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    max-width: 480px;
+  }
+  .loc-ok      { color: #4caf50; background: #e8f5e9; }
+  .loc-far     { color: #f44336; background: #ffebee; }
+  .loc-loading { color: #ff9800; background: #fff3e0; }
+  .loc-error   { color: #9e8a7e; background: #f5f0eb; }
 </style>
 </head>
 <body>
@@ -230,6 +244,7 @@
 </header>
 
 <div class="conn-status conn-ing" id="connStatus">Firebase 연결 중...</div>
+<div class="location-status loc-loading" id="locStatus">📍 위치 확인 중...</div>
 
 <div class="date-nav">
   <button onclick="changeDate(-1)">‹</button>
@@ -265,6 +280,60 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
+
+// ── 로렐 스튜디오 위치 (홍대 3층) ────────────
+const STUDIO_LAT = 37.5563;   // 위도
+const STUDIO_LNG = 126.9236;  // 경도
+const ALLOWED_RADIUS_M = 200; // 허용 반경 (미터)
+
+let isNearStudio = false; // GPS 허용 여부
+
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function checkLocation() {
+  const el = document.getElementById('locStatus');
+  if (!navigator.geolocation) {
+    el.textContent = '📍 GPS를 지원하지 않는 기기예요';
+    el.className = 'location-status loc-error';
+    isNearStudio = false;
+    renderAll();
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const dist = calcDistance(pos.coords.latitude, pos.coords.longitude, STUDIO_LAT, STUDIO_LNG);
+      const distM = Math.round(dist);
+      if (dist <= ALLOWED_RADIUS_M) {
+        el.textContent = `✅ 매장 근처 확인 (${distM}m) — 출퇴근 가능`;
+        el.className = 'location-status loc-ok';
+        isNearStudio = true;
+      } else {
+        el.textContent = `🚫 매장에서 ${distM}m 떨어져 있어요 — 출퇴근 불가`;
+        el.className = 'location-status loc-far';
+        isNearStudio = false;
+      }
+      renderAll();
+    },
+    (err) => {
+      el.textContent = '📍 위치 권한을 허용해주세요';
+      el.className = 'location-status loc-error';
+      isNearStudio = false;
+      renderAll();
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+// 30초마다 위치 재확인
+checkLocation();
+setInterval(checkLocation, 30000);
 
 // ── 직원 목록 ──────────────────────────────
 const STAFF = [
@@ -316,12 +385,14 @@ async function loadDay() {
 
 // ── 출근 / 퇴근 ───────────────────────────
 window.clockIn = (staffId) => {
+  if (!isNearStudio) { alert('📍 매장 근처에서만 출근 체크가 가능해요!'); return; }
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].in = nowHHMM();
   saveRecord(staffId);
   renderAll();
 };
 window.clockOut = (staffId) => {
+  if (!isNearStudio) { alert('📍 매장 근처에서만 퇴근 체크가 가능해요!'); return; }
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].out = nowHHMM();
   saveRecord(staffId);
