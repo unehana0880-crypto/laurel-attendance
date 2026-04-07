@@ -2,639 +2,454 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Laurel Studio — 근태 체크</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laurel Studio — 근태관리</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-:root {
-  --bg: #F4F1EC;
-  --card: #FFFFFF;
-  --dark: #1C1917;
-  --border: #E5DDD5;
-  --green: #4A7C59;
-  --green-bg: #EBF4EE;
-  --gold: #C9A84C;
-  --gold-bg: #FEF9E4;
-  --red: #B94040;
-  --red-bg: #FDEAEA;
-  --mid: #7A726A;
-  --blue: #1E5FAD;
-  --blue-bg: #EAF0F8;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background: var(--bg);
-  color: var(--dark);
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  padding-bottom: 40px;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: #f5f0eb;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  header {
+    text-align: center;
+    padding: 20px 0 28px;
+  }
+  header h1 {
+    font-size: 20px;
+    color: #3b2e2e;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+  header p {
+    font-size: 12px;
+    color: #9e8a7e;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
 
-/* Header */
-.header {
-  background: var(--dark);
-  padding: 20px 20px 16px;
-  text-align: center;
-}
-.header-sub { font-size: 10px; letter-spacing: 0.2em; color: #9A9088; margin-bottom: 4px; }
-.header-title { font-size: 22px; font-weight: 700; color: white; }
-.header-time { font-size: 28px; font-weight: 700; color: var(--gold); margin-top: 6px; font-variant-numeric: tabular-nums; }
-.header-date { font-size: 12px; color: #9A9088; margin-top: 2px; }
+  /* 날짜 네비게이션 */
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .date-nav button {
+    background: none;
+    border: 1px solid #c9b8a8;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #6b5344;
+  }
+  .date-nav .date-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #3b2e2e;
+    min-width: 130px;
+    text-align: center;
+  }
+  .today-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid #c9b8a8;
+    border-radius: 12px;
+    background: white;
+    color: #6b5344;
+    cursor: pointer;
+  }
 
-/* Tabs */
-.tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--dark);
-  padding: 0 16px 12px;
-  gap: 8px;
-}
-.tab {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.tab.active { background: var(--gold); color: var(--dark); }
-.tab.inactive { background: #2A2A2A; color: #888; }
+  /* 직원 카드 */
+  .staff-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .staff-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .staff-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .staff-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3b2e2e;
+  }
+  .staff-role {
+    font-size: 11px;
+    color: #9e8a7e;
+    margin-top: 2px;
+  }
+  .status-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .status-off    { background: #f0ebe5; color: #9e8a7e; }
+  .status-in     { background: #e8f5e9; color: #388e3c; }
+  .status-out    { background: #e3f2fd; color: #1565c0; }
 
-/* Content */
-.content { padding: 16px; }
+  /* 시간 표시 */
+  .time-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .time-box {
+    flex: 1;
+    background: #faf8f5;
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .time-box label {
+    font-size: 10px;
+    color: #9e8a7e;
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .time-box .time-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3b2e2e;
+    letter-spacing: 1px;
+  }
+  .time-box .time-val.empty {
+    color: #d4c5b8;
+    font-size: 14px;
+    font-weight: 400;
+  }
 
-/* Staff selector */
-.section { background: var(--card); border-radius: 14px; border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
-.section-hdr { padding: 13px 16px; background: #FAFAFA; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; color: var(--mid); letter-spacing: 0.06em; }
-.section-body { padding: 14px 16px; }
+  /* 버튼 */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  .btn-in  { background: #4caf50; color: white; }
+  .btn-out { background: #2196f3; color: white; }
+  .btn-reset { background: #f5f0eb; color: #9e8a7e; border: 1px solid #e0d5cc; flex: 0 0 auto; padding: 11px 14px; }
 
-.staff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.staff-btn {
-  padding: 12px 6px;
-  border-radius: 10px;
-  border: 2px solid var(--border);
-  background: white;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.15s;
-}
-.staff-btn.selected { border-color: var(--dark); background: var(--dark); color: white; }
-.staff-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  /* 메모 */
+  .memo-row {
+    margin-top: 10px;
+  }
+  .memo-row input {
+    width: 100%;
+    border: 1px solid #e8ddd5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #3b2e2e;
+    background: #faf8f5;
+    outline: none;
+  }
+  .memo-row input:focus { border-color: #c9b8a8; }
 
-/* GPS Status */
-.gps-box {
-  border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.gps-box.checking { background: var(--gold-bg); border: 1px solid #E8D08A; }
-.gps-box.ok { background: var(--green-bg); border: 1px solid #B0D4BC; }
-.gps-box.fail { background: var(--red-bg); border: 1px solid #F9C0C0; }
-.gps-box.idle { background: #F0F0F0; border: 1px solid var(--border); }
-.gps-icon { font-size: 28px; flex-shrink: 0; }
-.gps-title { font-size: 13px; font-weight: 700; }
-.gps-desc { font-size: 11px; color: var(--mid); margin-top: 3px; line-height: 1.5; }
-.gps-box.ok .gps-title { color: var(--green); }
-.gps-box.fail .gps-title { color: var(--red); }
-.gps-box.checking .gps-title { color: #8B6914; }
+  /* 로그 섹션 */
+  .log-section {
+    max-width: 480px;
+    margin: 24px auto 0;
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .log-section h3 {
+    font-size: 13px;
+    color: #9e8a7e;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f0eb;
+    font-size: 13px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-name { color: #3b2e2e; font-weight: 500; }
+  .log-detail { color: #9e8a7e; font-size: 12px; }
+  .log-hours { color: #6b5344; font-weight: 600; }
+  .no-log { color: #d4c5b8; font-size: 13px; text-align: center; padding: 12px 0; }
 
-/* Check buttons */
-.check-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.check-btn {
-  padding: 18px 10px;
-  border-radius: 14px;
-  border: none;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s;
-}
-.check-btn:active { transform: scale(0.97); }
-.check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.check-btn.in { background: var(--green); color: white; }
-.check-btn.out { background: var(--dark); color: white; }
-.check-btn .btn-icon { font-size: 24px; }
-.check-btn .btn-label { font-size: 13px; }
+  /* 연결 상태 */
+  .conn-status {
+    text-align: center;
+    font-size: 11px;
+    margin-bottom: 16px;
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .conn-ok  { color: #4caf50; background: #e8f5e9; }
+  .conn-err { color: #f44336; background: #ffebee; }
+  .conn-ing { color: #ff9800; background: #fff3e0; }
 
-/* Today log */
-.log-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border);
-}
-.log-item:last-child { border-bottom: none; }
-.log-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  flex-shrink: 0;
-}
-.log-badge.in { background: var(--green-bg); color: var(--green); }
-.log-badge.out { background: var(--blue-bg); color: var(--blue); }
-.log-badge.fail { background: var(--red-bg); color: var(--red); }
-.log-name { font-size: 13px; font-weight: 600; flex: 1; }
-.log-time { font-size: 13px; font-weight: 700; color: var(--dark); }
-.log-dist { font-size: 10px; color: var(--mid); }
-.empty-log { text-align: center; padding: 24px; color: var(--border); font-size: 13px; }
-
-/* Admin view */
-.admin-section { display: none; }
-.admin-section.active { display: block; }
-
-/* Month selector */
-.month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.month-btn { width: 36px; height: 36px; border: 1px solid var(--border); background: var(--card); border-radius: 10px; font-size: 18px; cursor: pointer; }
-.month-label { font-size: 16px; font-weight: 700; }
-
-/* Attendance table */
-.att-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.att-table th { background: var(--dark); color: white; padding: 8px 6px; text-align: center; font-size: 11px; }
-.att-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border); }
-.att-table tr:nth-child(even) td { background: #FAFAFA; }
-.att-in { color: var(--green); font-weight: 600; }
-.att-out { color: var(--blue); font-weight: 600; }
-.att-late { color: var(--red); font-weight: 700; }
-.att-miss { color: var(--border); }
-
-/* Export btn */
-.btn-export {
-  width: 100%;
-  padding: 14px;
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.btn-export:active { opacity: 0.85; }
-
-/* Summary cards */
-.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-.sum-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
-.sum-num { font-size: 22px; font-weight: 700; }
-.sum-label { font-size: 10px; color: var(--mid); margin-top: 2px; }
-
-/* PIN overlay */
-.pin-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(28,25,23,0.7);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-}
-.pin-overlay.open { display: flex; }
-.pin-box { background: white; border-radius: 20px; padding: 24px 20px; width: 280px; text-align: center; }
-.pin-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-.pin-sub { font-size: 12px; color: var(--mid); margin-bottom: 16px; }
-.pin-input { font-size: 28px; letter-spacing: 0.3em; text-align: center; width: 100%; border: 2px solid var(--border); border-radius: 10px; padding: 10px; font-family: inherit; margin-bottom: 12px; }
-.pin-input:focus { border-color: var(--dark); outline: none; }
-.pin-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.pin-btn { padding: 12px; border: none; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
-.pin-ok { background: var(--dark); color: white; }
-.pin-cancel { background: var(--bg); color: var(--mid); }
+  .sync-time {
+    text-align: center;
+    font-size: 10px;
+    color: #c9b8a8;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-sub">LAUREL STUDIO · 근태 관리</div>
-  <div class="header-title">출퇴근 체크</div>
-  <div class="header-time" id="liveClock">00:00:00</div>
-  <div class="header-date" id="liveDate"></div>
+<header>
+  <h1>🌿 LAUREL STUDIO</h1>
+  <p>근태 관리</p>
+</header>
+
+<div class="conn-status conn-ing" id="connStatus">Firebase 연결 중...</div>
+
+<div class="date-nav">
+  <button onclick="changeDate(-1)">‹</button>
+  <span class="date-label" id="dateLabel"></span>
+  <button onclick="changeDate(1)">›</button>
+  <button class="today-btn" onclick="goToday()">오늘</button>
 </div>
 
-<div class="tabs">
-  <button class="tab active" id="tabCheck" onclick="switchTab('check')">📍 출퇴근 체크</button>
-  <button class="tab inactive" id="tabAdmin" onclick="switchTab('admin')">📊 관리자 보기</button>
+<div class="staff-grid" id="staffGrid"></div>
+
+<div class="log-section">
+  <h3>📋 당일 요약</h3>
+  <div id="logList"><p class="no-log">기록 없음</p></div>
 </div>
 
-<div class="content">
+<div class="sync-time" id="syncTime"></div>
 
-  <!-- ── 체크 탭 ── -->
-  <div id="checkSection">
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    <!-- 직원 선택 -->
-    <div class="section">
-      <div class="section-hdr">STAFF 선택</div>
-      <div class="section-body">
-        <div class="staff-grid">
-          <button class="staff-btn" onclick="selectStaff('배예진')" id="staff-배예진">
-            <span class="staff-icon">🌿</span>배예진
-          </button>
-          <button class="staff-btn" onclick="selectStaff('다운')" id="staff-다운">
-            <span class="staff-icon">☀️</span>다운
-          </button>
-          <button class="staff-btn" onclick="selectStaff('수진')" id="staff-수진">
-            <span class="staff-icon">⭐</span>수진
-          </button>
+const firebaseConfig = {
+  apiKey: "AIzaSyA0nJAcOV64dq2QT2BVSsGxis99VTA2eEI",
+  authDomain: "laurel-studio.firebaseapp.com",
+  databaseURL: "https://laurel-studio-default-rtdb.firebaseio.com",
+  projectId: "laurel-studio",
+  storageBucket: "laurel-studio.firebasestorage.app",
+  messagingSenderId: "516403607342",
+  appId: "1:516403607342:web:5389cdfe397afcee1cacbf",
+  measurementId: "G-JXJVBBYW9P"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── 직원 목록 ──────────────────────────────
+const STAFF = [
+  { id: "yejin",  name: "배예진", role: "매니저" },
+  { id: "dawn",   name: "다운",   role: "웨이팅룸 담당" },
+  { id: "sujin",  name: "수진",   role: "매니저 (5월~)" },
+];
+
+// ── 날짜 상태 ──────────────────────────────
+let currentDate = new Date();
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateDisplay(d) {
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+function isToday(d) {
+  const t = new Date();
+  return dateKey(d) === dateKey(t);
+}
+
+window.changeDate = (delta) => {
+  currentDate.setDate(currentDate.getDate() + delta);
+  loadDay();
+};
+window.goToday = () => { currentDate = new Date(); loadDay(); };
+
+// ── 데이터 캐시 ────────────────────────────
+let dayData = {};   // { yejin: {in, out, memo}, ... }
+
+// ── Firebase 읽기/쓰기 ─────────────────────
+function dbPath(staffId) {
+  return `attendance/${dateKey(currentDate)}/${staffId}`;
+}
+
+async function saveRecord(staffId) {
+  const r = dayData[staffId] || {};
+  await set(ref(db, dbPath(staffId)), r);
+  updateSyncTime();
+}
+
+async function loadDay() {
+  document.getElementById('dateLabel').textContent = dateDisplay(currentDate);
+  const snap = await get(ref(db, `attendance/${dateKey(currentDate)}`));
+  dayData = snap.exists() ? snap.val() : {};
+  renderAll();
+}
+
+// ── 출근 / 퇴근 ───────────────────────────
+window.clockIn = (staffId) => {
+  if (!dayData[staffId]) dayData[staffId] = {};
+  dayData[staffId].in = nowHHMM();
+  saveRecord(staffId);
+  renderAll();
+};
+window.clockOut = (staffId) => {
+  if (!dayData[staffId]) dayData[staffId] = {};
+  dayData[staffId].out = nowHHMM();
+  saveRecord(staffId);
+  renderAll();
+};
+window.resetRecord = (staffId) => {
+  if (!confirm(`${STAFF.find(s=>s.id===staffId).name} 기록을 초기화할까요?`)) return;
+  dayData[staffId] = {};
+  saveRecord(staffId);
+  renderAll();
+};
+window.saveMemo = (staffId, val) => {
+  if (!dayData[staffId]) dayData[staffId] = {};
+  dayData[staffId].memo = val;
+  saveRecord(staffId);
+};
+
+function nowHHMM() {
+  const n = new Date();
+  return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+
+// ── 근무 시간 계산 ─────────────────────────
+function calcHours(inT, outT) {
+  if (!inT || !outT) return null;
+  const [ih, im] = inT.split(':').map(Number);
+  const [oh, om] = outT.split(':').map(Number);
+  const diff = (oh*60+om) - (ih*60+im);
+  if (diff <= 0) return null;
+  const h = Math.floor(diff/60), m = diff%60;
+  return m ? `${h}h ${m}m` : `${h}h`;
+}
+
+// ── 렌더링 ────────────────────────────────
+function renderAll() {
+  renderCards();
+  renderLog();
+}
+
+function renderCards() {
+  const grid = document.getElementById('staffGrid');
+  grid.innerHTML = '';
+  const today = isToday(currentDate);
+
+  STAFF.forEach(s => {
+    const rec = dayData[s.id] || {};
+    const hasIn  = !!rec.in;
+    const hasOut = !!rec.out;
+    let statusClass = 'status-off', statusText = '미출근';
+    if (hasIn && hasOut) { statusClass='status-out'; statusText='퇴근'; }
+    else if (hasIn)      { statusClass='status-in';  statusText='근무중'; }
+
+    const hours = calcHours(rec.in, rec.out);
+
+    grid.innerHTML += `
+    <div class="staff-card">
+      <div class="staff-header">
+        <div>
+          <div class="staff-name">${s.name}</div>
+          <div class="staff-role">${s.role}</div>
+        </div>
+        <span class="status-badge ${statusClass}">${statusText}</span>
+      </div>
+      <div class="time-row">
+        <div class="time-box">
+          <label>출근</label>
+          <div class="time-val ${hasIn?'':'empty'}">${rec.in || '- -'}</div>
+        </div>
+        <div class="time-box">
+          <label>퇴근</label>
+          <div class="time-val ${hasOut?'':'empty'}">${rec.out || '- -'}</div>
+        </div>
+        <div class="time-box">
+          <label>근무시간</label>
+          <div class="time-val ${hours?'':'empty'}">${hours || '- -'}</div>
         </div>
       </div>
-    </div>
-
-    <!-- GPS 상태 -->
-    <div class="gps-box idle" id="gpsBox">
-      <div class="gps-icon">📍</div>
-      <div>
-        <div class="gps-title">위치 확인 대기 중</div>
-        <div class="gps-desc">직원 선택 후 출퇴근 버튼을 누르면<br>위치를 자동으로 확인합니다</div>
+      <div class="btn-row">
+        <button class="btn btn-in"  onclick="clockIn('${s.id}')"  ${(!today||hasIn)?'disabled':''}>출근</button>
+        <button class="btn btn-out" onclick="clockOut('${s.id}')" ${(!today||!hasIn||hasOut)?'disabled':''}>퇴근</button>
+        <button class="btn btn-reset" onclick="resetRecord('${s.id}')">↺</button>
       </div>
-    </div>
-
-    <!-- 출퇴근 버튼 -->
-    <div class="check-btns">
-      <button class="check-btn in" id="btnIn" onclick="doCheck('in')" disabled>
-        <span class="btn-icon">🟢</span>
-        <span class="btn-label">출 근</span>
-      </button>
-      <button class="check-btn out" id="btnOut" onclick="doCheck('out')" disabled>
-        <span class="btn-icon">🌙</span>
-        <span class="btn-label">퇴 근</span>
-      </button>
-    </div>
-
-    <!-- 오늘 기록 -->
-    <div class="section">
-      <div class="section-hdr">오늘 기록</div>
-      <div class="section-body" id="todayLog">
-        <div class="empty-log">아직 기록이 없어요</div>
+      <div class="memo-row">
+        <input type="text" placeholder="메모 (특이사항 등)" value="${rec.memo||''}"
+          onblur="saveMemo('${s.id}', this.value)"
+          onkeydown="if(event.key==='Enter') this.blur()">
       </div>
-    </div>
-
-  </div>
-
-  <!-- ── 관리자 탭 ── -->
-  <div id="adminSection" style="display:none;">
-
-    <div class="month-nav">
-      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
-      <div class="month-label" id="monthLabel"></div>
-      <button class="month-btn" onclick="changeMonth(1)">›</button>
-    </div>
-
-    <!-- 요약 -->
-    <div id="summaryCards"></div>
-
-    <!-- 테이블 -->
-    <div class="section">
-      <div class="section-hdr">상세 기록</div>
-      <div class="section-body" style="padding:0;overflow-x:auto;">
-        <table class="att-table" id="attTable">
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>직원</th>
-              <th>출근</th>
-              <th>퇴근</th>
-              <th>비고</th>
-            </tr>
-          </thead>
-          <tbody id="attBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <button class="btn-export" onclick="exportExcel()">📥 엑셀 다운로드</button>
-
-  </div>
-
-</div>
-
-<!-- PIN 팝업 -->
-<div class="pin-overlay" id="pinOverlay">
-  <div class="pin-box">
-    <div class="pin-title">🔒 관리자 확인</div>
-    <div class="pin-sub">PIN 번호를 입력해주세요</div>
-    <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="••••"
-      onkeydown="if(event.key==='Enter')checkPin()">
-    <div class="pin-btns">
-      <button class="pin-btn pin-cancel" onclick="closePin()">취소</button>
-      <button class="pin-btn pin-ok" onclick="checkPin()">확인</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── 설정 ──
-const STUDIO_LAT = 37.55378;  // 로렐 스튜디오 위도
-const STUDIO_LNG = 126.92305; // 로렐 스튜디오 경도
-const RADIUS_M = 150;          // 허용 반경 (미터)
-const ADMIN_PIN = '0880';      // 관리자 PIN (변경 가능)
-const LATE_TIME = '09:50';     // 지각 기준 시간 (9시 50분)
-const STORAGE_KEY = 'laurel_attendance_v1';
-
-let selectedStaff = null;
-let currentTab = 'check';
-let adminUnlocked = false;
-let viewYear = new Date().getFullYear();
-let viewMonth = new Date().getMonth();
-
-// ── 시계 ──
-function updateClock() {
-  const now = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  document.getElementById('liveClock').textContent =
-    String(now.getHours()).padStart(2,'0') + ':' +
-    String(now.getMinutes()).padStart(2,'0') + ':' +
-    String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('liveDate').textContent =
-    now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일 (' + days[now.getDay()] + ')';
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ── 데이터 ──
-function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch(e) { return []; }
-}
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    </div>`;
+  });
 }
 
-// ── 직원 선택 ──
-function selectStaff(name) {
-  selectedStaff = name;
-  document.querySelectorAll('.staff-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('staff-' + name).classList.add('selected');
-  document.getElementById('btnIn').disabled = false;
-  document.getElementById('btnOut').disabled = false;
-  setGps('idle', '위치 확인 대기 중', '출근/퇴근 버튼을 누르면 위치를 확인합니다');
-}
-
-// ── GPS ──
-function setGps(state, title, desc) {
-  const box = document.getElementById('gpsBox');
-  box.className = 'gps-box ' + state;
-  box.querySelector('.gps-title').textContent = title;
-  box.querySelector('.gps-desc').textContent = desc;
-  const icons = { idle:'📍', checking:'🔍', ok:'✅', fail:'❌' };
-  box.querySelector('.gps-icon').textContent = icons[state] || '📍';
-}
-
-function getDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const dLat = (lat2-lat1) * Math.PI/180;
-  const dLng = (lng2-lng1) * Math.PI/180;
-  const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-// ── 체크 ──
-function doCheck(type) {
-  if (!selectedStaff) { alert('직원을 먼저 선택해주세요!'); return; }
-
-  setGps('checking', '위치 확인 중...', 'GPS 신호를 수신하고 있습니다');
-  document.getElementById('btnIn').disabled = true;
-  document.getElementById('btnOut').disabled = true;
-
-  if (!navigator.geolocation) {
-    recordCheck(type, null, null, 'GPS 미지원');
+function renderLog() {
+  const list = document.getElementById('logList');
+  const entries = STAFF.map(s => ({ ...s, rec: dayData[s.id]||{} }))
+                       .filter(s => s.rec.in || s.rec.out);
+  if (!entries.length) {
+    list.innerHTML = '<p class="no-log">기록 없음</p>';
     return;
   }
-
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      const dist = Math.round(getDistance(
-        pos.coords.latitude, pos.coords.longitude,
-        STUDIO_LAT, STUDIO_LNG
-      ));
-      if (dist <= RADIUS_M) {
-        setGps('ok', '✅ 위치 확인 완료', '로렐 스튜디오 내 (' + dist + 'm)');
-        recordCheck(type, pos.coords.latitude, pos.coords.longitude, '정상 (' + dist + 'm)');
-      } else {
-        setGps('fail', '❌ 위치 범위 초과', '스튜디오에서 ' + dist + 'm 떨어져 있습니다\n(허용 범위: ' + RADIUS_M + 'm 이내)');
-        if (confirm('⚠️ 스튜디오에서 ' + dist + 'm 떨어진 위치입니다.\n그래도 기록할까요? (사유 기록됨)')) {
-          recordCheck(type, pos.coords.latitude, pos.coords.longitude, '범위초과 ' + dist + 'm');
-        } else {
-          document.getElementById('btnIn').disabled = false;
-          document.getElementById('btnOut').disabled = false;
-        }
-      }
-    },
-    err => {
-      setGps('fail', 'GPS 오류', '위치를 가져올 수 없습니다. 위치 권한을 확인해주세요.');
-      if (confirm('GPS를 사용할 수 없습니다.\n위치 확인 없이 기록할까요?')) {
-        recordCheck(type, null, null, 'GPS없음');
-      } else {
-        document.getElementById('btnIn').disabled = false;
-        document.getElementById('btnOut').disabled = false;
-      }
-    },
-    { timeout: 10000, enableHighAccuracy: true }
-  );
+  list.innerHTML = entries.map(s => {
+    const h = calcHours(s.rec.in, s.rec.out);
+    return `<div class="log-item">
+      <span class="log-name">${s.name}</span>
+      <span class="log-detail">${s.rec.in||'?'} → ${s.rec.out||'근무중'}</span>
+      <span class="log-hours">${h||'진행중'}</span>
+    </div>`;
+  }).join('');
 }
 
-function recordCheck(type, lat, lng, note) {
-  const now = new Date();
-  const record = {
-    id: Date.now(),
-    staff: selectedStaff,
-    type: type,
-    date: now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'),
-    time: String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0'),
-    lat: lat,
-    lng: lng,
-    note: note,
-    timestamp: now.toISOString()
-  };
-
-  const data = loadData();
-  data.push(record);
-  saveData(data);
-
-  document.getElementById('btnIn').disabled = false;
-  document.getElementById('btnOut').disabled = false;
-
-  renderTodayLog();
-
-  const typeLabel = type === 'in' ? '출근' : '퇴근';
-  alert('✅ ' + selectedStaff + ' ' + typeLabel + ' 완료!\n시간: ' + record.time + '\n비고: ' + note);
+function updateSyncTime() {
+  document.getElementById('syncTime').textContent =
+    `마지막 저장: ${new Date().toLocaleTimeString('ko-KR')}`;
 }
 
-// ── 오늘 기록 렌더 ──
-function renderTodayLog() {
-  const today = new Date();
-  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  const data = loadData().filter(r => r.date === todayStr);
-  const el = document.getElementById('todayLog');
-
-  if (!data.length) {
-    el.innerHTML = '<div class="empty-log">아직 기록이 없어요</div>';
-    return;
-  }
-
-  el.innerHTML = data.slice().reverse().map(r => `
-    <div class="log-item">
-      <span class="log-badge ${r.type}">${r.type==='in'?'출근':'퇴근'}</span>
-      <span class="log-name">${r.staff}</span>
-      <div style="text-align:right">
-        <div class="log-time">${r.time}</div>
-        <div class="log-dist">${r.note}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── 탭 전환 ──
-function switchTab(tab) {
-  if (tab === 'admin' && !adminUnlocked) {
-    document.getElementById('pinOverlay').classList.add('open');
-    document.getElementById('pinInput').value = '';
-    setTimeout(() => document.getElementById('pinInput').focus(), 100);
-    return;
-  }
-  currentTab = tab;
-  document.getElementById('checkSection').style.display = tab === 'check' ? 'block' : 'none';
-  document.getElementById('adminSection').style.display = tab === 'admin' ? 'block' : 'none';
-  document.getElementById('tabCheck').className = 'tab ' + (tab==='check' ? 'active' : 'inactive');
-  document.getElementById('tabAdmin').className = 'tab ' + (tab==='admin' ? 'active' : 'inactive');
-  if (tab === 'admin') renderAdmin();
-}
-
-// ── PIN ──
-function checkPin() {
-  const pin = document.getElementById('pinInput').value;
-  if (pin === ADMIN_PIN) {
-    adminUnlocked = true;
-    closePin();
-    switchTab('admin');
+// ── Firebase 연결 상태 감지 ─────────────────
+onValue(ref(db, '.info/connected'), (snap) => {
+  const el = document.getElementById('connStatus');
+  if (snap.val()) {
+    el.textContent = '🟢 Firebase 실시간 연결됨';
+    el.className = 'conn-status conn-ok';
   } else {
-    alert('PIN이 틀렸습니다');
-    document.getElementById('pinInput').value = '';
-    document.getElementById('pinInput').focus();
+    el.textContent = '🔴 오프라인 — 재연결 시도 중';
+    el.className = 'conn-status conn-err';
   }
-}
-function closePin() {
-  document.getElementById('pinOverlay').classList.remove('open');
-}
+});
 
-// ── 관리자 렌더 ──
-const MO = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-function changeMonth(d) {
-  viewMonth += d;
-  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-  renderAdmin();
-}
-
-function renderAdmin() {
-  document.getElementById('monthLabel').textContent = viewYear + '년 ' + MO[viewMonth];
-  const data = loadData();
-  const monthStr = viewYear + '-' + String(viewMonth+1).padStart(2,'0');
-  const monthData = data.filter(r => r.date.startsWith(monthStr));
-
-  // 직원별 요약
-  const staffs = ['배예진','다운','수진'];
-  const summary = {};
-  staffs.forEach(s => { summary[s] = { in: 0, out: 0, late: 0 }; });
-  monthData.forEach(r => {
-    if (!summary[r.staff]) summary[r.staff] = { in:0, out:0, late:0 };
-    if (r.type === 'in') {
-      summary[r.staff].in++;
-      if (r.time > LATE_TIME) summary[r.staff].late++;
-    }
-    if (r.type === 'out') summary[r.staff].out++;
-  });
-
-  document.getElementById('summaryCards').innerHTML = staffs.map(s => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;">
-      <div style="font-size:13px;font-weight:700;margin-bottom:8px;">${s}</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;">
-        <div><div style="font-size:18px;font-weight:700;color:var(--green)">${summary[s]?.in||0}</div><div style="font-size:10px;color:var(--mid)">출근</div></div>
-        <div><div style="font-size:18px;font-weight:700;color:var(--blue)">${summary[s]?.out||0}</div><div style="font-size:10px;color:var(--mid)">퇴근</div></div>
-        <div><div style="font-size:18px;font-weight:700;color:var(--red)">${summary[s]?.late||0}</div><div style="font-size:10px;color:var(--mid)">지각</div></div>
-      </div>
-    </div>
-  `).join('');
-
-  // 테이블
-  const tbody = document.getElementById('attBody');
-  if (!monthData.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;color:var(--border)">기록 없음</td></tr>';
-    return;
-  }
-
-  // 날짜별 그룹
-  const grouped = {};
-  monthData.forEach(r => {
-    const key = r.date + '_' + r.staff;
-    if (!grouped[key]) grouped[key] = { date: r.date, staff: r.staff, in: null, out: null, notes: [] };
-    if (r.type === 'in' && !grouped[key].in) grouped[key].in = r.time;
-    if (r.type === 'out') grouped[key].out = r.time;
-    grouped[key].notes.push(r.note);
-  });
-
-  tbody.innerHTML = Object.values(grouped)
-    .sort((a,b) => b.date.localeCompare(a.date))
-    .map(g => {
-      const isLate = g.in && g.in > LATE_TIME;
-      const noteStr = [...new Set(g.notes)].join(', ');
-      return `<tr>
-        <td>${g.date.slice(5)}</td>
-        <td>${g.staff}</td>
-        <td class="${g.in ? (isLate?'att-late':'att-in') : 'att-miss'}">${g.in || '-'}</td>
-        <td class="${g.out ? 'att-out' : 'att-miss'}">${g.out || '-'}</td>
-        <td style="font-size:10px;color:var(--mid)">${noteStr.includes('초과')||noteStr.includes('없음') ? '⚠️' : ''}${noteStr}</td>
-      </tr>`;
-    }).join('');
-}
-
-// ── 엑셀 다운로드 ──
-function exportExcel() {
-  const data = loadData();
-  const monthStr = viewYear + '-' + String(viewMonth+1).padStart(2,'0');
-  const monthData = data.filter(r => r.date.startsWith(monthStr));
-
-  if (!monthData.length) { alert('이 달의 기록이 없어요!'); return; }
-
-  // CSV 생성
-  const headers = ['날짜','직원','유형','시간','위도','경도','비고'];
-  const rows = monthData.map(r => [
-    r.date, r.staff, r.type==='in'?'출근':'퇴근', r.time,
-    r.lat||'', r.lng||'', r.note||''
-  ]);
-
-  const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '로렐_근태_' + viewYear + '_' + String(viewMonth+1).padStart(2,'0') + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// 초기화
-renderTodayLog();
+// ── 초기 로드 ─────────────────────────────
+loadDay();
 </script>
 </body>
 </html>
