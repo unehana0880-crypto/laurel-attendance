@@ -99,12 +99,13 @@
   }
   .status-off    { background: #f0ebe5; color: #9e8a7e; }
   .status-in     { background: #e8f5e9; color: #388e3c; }
+  .status-break  { background: #fff3e0; color: #ef6c00; }
   .status-out    { background: #e3f2fd; color: #1565c0; }
 
   .time-row {
     display: flex;
     gap: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
   .time-box {
     flex: 1;
@@ -131,11 +132,34 @@
     font-size: 14px;
     font-weight: 400;
   }
+  .time-box.break-box { background: #fdf6ee; }
+  .time-box.break-box .time-val { color: #ef6c00; }
+  .time-box.actual-box { background: #f0f4ee; }
+  .time-box.actual-box .time-val { color: #4a7c2f; }
+
+  /* 휴식 상세 목록 */
+  .break-detail {
+    background: #fdf6ee;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: #b07d4a;
+  }
+  .break-detail .break-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .break-detail .break-line:not(:last-child) {
+    border-bottom: 1px dashed #f0e0cd;
+  }
 
   .btn-row {
     display: flex;
     gap: 8px;
   }
+  .btn-row + .btn-row { margin-top: 8px; }
   .btn {
     flex: 1;
     padding: 11px;
@@ -150,6 +174,8 @@
   .btn:disabled { opacity: 0.35; cursor: default; }
   .btn-in  { background: #4caf50; color: white; }
   .btn-out { background: #2196f3; color: white; }
+  .btn-break-start { background: #ff9800; color: white; }
+  .btn-break-end   { background: #f57c00; color: white; }
   .btn-reset { background: #f5f0eb; color: #9e8a7e; border: 1px solid #e0d5cc; flex: 0 0 auto; padding: 11px 14px; }
 
   .memo-row {
@@ -190,9 +216,10 @@
     font-size: 13px;
   }
   .log-item:last-child { border-bottom: none; }
-  .log-name { color: #3b2e2e; font-weight: 500; }
-  .log-detail { color: #9e8a7e; font-size: 12px; }
-  .log-hours { color: #6b5344; font-weight: 600; }
+  .log-name { color: #3b2e2e; font-weight: 500; flex: 0 0 56px; }
+  .log-detail { color: #9e8a7e; font-size: 12px; flex: 1; text-align: center; }
+  .log-break { color: #ef6c00; font-size: 11px; flex: 0 0 auto; margin-right: 10px; }
+  .log-hours { color: #6b5344; font-weight: 600; flex: 0 0 auto; }
   .no-log { color: #d4c5b8; font-size: 13px; text-align: center; padding: 12px 0; }
 
   .conn-status {
@@ -273,8 +300,8 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
 // ── 로렐 스튜디오 정확한 위치 ─────────────
-const STUDIO_LAT = 37.555559;   // ✅ 수정됨
-const STUDIO_LNG = 126.920661;  // ✅ 수정됨
+const STUDIO_LAT = 37.555559;
+const STUDIO_LNG = 126.920661;
 const ALLOWED_RADIUS_M = 200;
 
 let isNearStudio = false;
@@ -378,11 +405,48 @@ window.clockIn = (staffId) => {
 };
 window.clockOut = (staffId) => {
   if (!isNearStudio) { alert('📍 매장 근처에서만 퇴근 체크가 가능해요!'); return; }
+  const rec = dayData[staffId] || {};
+  // 휴식 중이면 퇴근 막기
+  if (isOnBreak(rec)) {
+    alert('☕ 휴식 중이에요. "휴식 종료"를 먼저 눌러주세요!');
+    return;
+  }
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].out = nowHHMM();
   saveRecord(staffId);
   renderAll();
 };
+
+// ── 휴식 기능 ──────────────────────────────
+window.breakStart = (staffId) => {
+  if (!isNearStudio) { alert('📍 매장 근처에서만 휴식 체크가 가능해요!'); return; }
+  const rec = dayData[staffId] || {};
+  if (!rec.in)  { alert('출근 후에 휴식을 시작할 수 있어요!'); return; }
+  if (rec.out)  { alert('이미 퇴근한 기록이에요.'); return; }
+  if (isOnBreak(rec)) { alert('이미 휴식 중이에요.'); return; }
+  if (!dayData[staffId]) dayData[staffId] = {};
+  if (!dayData[staffId].breaks) dayData[staffId].breaks = [];
+  dayData[staffId].breaks.push({ start: nowHHMM(), end: null });
+  saveRecord(staffId);
+  renderAll();
+};
+window.breakEnd = (staffId) => {
+  if (!isNearStudio) { alert('📍 매장 근처에서만 휴식 체크가 가능해요!'); return; }
+  const rec = dayData[staffId] || {};
+  if (!isOnBreak(rec)) { alert('진행 중인 휴식이 없어요.'); return; }
+  const last = rec.breaks[rec.breaks.length - 1];
+  last.end = nowHHMM();
+  saveRecord(staffId);
+  renderAll();
+};
+
+// 현재 휴식 중인지 (마지막 휴식 기록에 end가 없으면 휴식 중)
+function isOnBreak(rec) {
+  if (!rec.breaks || !rec.breaks.length) return false;
+  const last = rec.breaks[rec.breaks.length - 1];
+  return last && last.start && !last.end;
+}
+
 window.resetRecord = (staffId) => {
   if (!confirm(`${STAFF.find(s=>s.id===staffId).name} 기록을 초기화할까요?`)) return;
   dayData[staffId] = {};
@@ -400,14 +464,45 @@ function nowHHMM() {
   return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
 }
 
-function calcHours(inT, outT) {
-  if (!inT || !outT) return null;
-  const [ih, im] = inT.split(':').map(Number);
-  const [oh, om] = outT.split(':').map(Number);
-  const diff = (oh*60+om) - (ih*60+im);
-  if (diff <= 0) return null;
+// 분 단위로 변환
+function toMin(hhmm) {
+  if (!hhmm) return null;
+  const [h, m] = hhmm.split(':').map(Number);
+  return h*60 + m;
+}
+
+// 분 → "Xh Ym" 표기
+function fmtMin(diff) {
+  if (diff == null || diff <= 0) return null;
   const h = Math.floor(diff/60), m = diff%60;
-  return m ? `${h}h ${m}m` : `${h}h`;
+  if (h && m) return `${h}h ${m}m`;
+  if (h)      return `${h}h`;
+  return `${m}m`;
+}
+
+// 총 휴식 시간(분) — 완료된 휴식만 합산
+function totalBreakMin(rec) {
+  if (!rec.breaks || !rec.breaks.length) return 0;
+  let sum = 0;
+  rec.breaks.forEach(b => {
+    const s = toMin(b.start), e = toMin(b.end);
+    if (s != null && e != null && e > s) sum += (e - s);
+  });
+  return sum;
+}
+
+// 전체 근무시간(분) = 퇴근 - 출근
+function grossMin(rec) {
+  const s = toMin(rec.in), e = toMin(rec.out);
+  if (s == null || e == null || e <= s) return null;
+  return e - s;
+}
+
+// 실근무시간(분) = 전체 - 휴식
+function actualMin(rec) {
+  const g = grossMin(rec);
+  if (g == null) return null;
+  return Math.max(0, g - totalBreakMin(rec));
 }
 
 function renderAll() {
@@ -424,11 +519,30 @@ function renderCards() {
     const rec = dayData[s.id] || {};
     const hasIn  = !!rec.in;
     const hasOut = !!rec.out;
-    let statusClass = 'status-off', statusText = '미출근';
-    if (hasIn && hasOut) { statusClass='status-out'; statusText='퇴근'; }
-    else if (hasIn)      { statusClass='status-in';  statusText='근무중'; }
+    const onBreak = isOnBreak(rec);
 
-    const hours = calcHours(rec.in, rec.out);
+    let statusClass = 'status-off', statusText = '미출근';
+    if (hasIn && hasOut)      { statusClass='status-out';   statusText='퇴근'; }
+    else if (onBreak)         { statusClass='status-break'; statusText='휴식중'; }
+    else if (hasIn)           { statusClass='status-in';    statusText='근무중'; }
+
+    const breakMin = totalBreakMin(rec);
+    const breakStr = breakMin > 0 ? fmtMin(breakMin) : null;
+    const actualStr = fmtMin(actualMin(rec));
+
+    // 휴식 상세 줄
+    let breakDetailHTML = '';
+    if (rec.breaks && rec.breaks.length) {
+      const lines = rec.breaks.map((b, i) => {
+        const dur = (toMin(b.start)!=null && toMin(b.end)!=null && toMin(b.end)>toMin(b.start))
+                    ? fmtMin(toMin(b.end)-toMin(b.start)) : '진행중';
+        return `<div class="break-line">
+          <span>☕ 휴식 ${i+1}</span>
+          <span>${b.start || '?'} → ${b.end || '진행중'} &nbsp;(${dur})</span>
+        </div>`;
+      }).join('');
+      breakDetailHTML = `<div class="break-detail">${lines}</div>`;
+    }
 
     grid.innerHTML += `
     <div class="staff-card">
@@ -448,15 +562,26 @@ function renderCards() {
           <label>퇴근</label>
           <div class="time-val ${hasOut?'':'empty'}">${rec.out || '- -'}</div>
         </div>
-        <div class="time-box">
-          <label>근무시간</label>
-          <div class="time-val ${hours?'':'empty'}">${hours || '- -'}</div>
+      </div>
+      <div class="time-row">
+        <div class="time-box break-box">
+          <label>휴식 합계</label>
+          <div class="time-val ${breakStr?'':'empty'}">${breakStr || '- -'}</div>
+        </div>
+        <div class="time-box actual-box">
+          <label>실근무시간</label>
+          <div class="time-val ${actualStr?'':'empty'}">${actualStr || '- -'}</div>
         </div>
       </div>
+      ${breakDetailHTML}
       <div class="btn-row">
         <button class="btn btn-in"  onclick="clockIn('${s.id}')"  ${(!today||hasIn)?'disabled':''}>출근</button>
-        <button class="btn btn-out" onclick="clockOut('${s.id}')" ${(!today||!hasIn||hasOut)?'disabled':''}>퇴근</button>
+        <button class="btn btn-out" onclick="clockOut('${s.id}')" ${(!today||!hasIn||hasOut||onBreak)?'disabled':''}>퇴근</button>
         <button class="btn btn-reset" onclick="resetRecord('${s.id}')">↺</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-break-start" onclick="breakStart('${s.id}')" ${(!today||!hasIn||hasOut||onBreak)?'disabled':''}>휴식 시작</button>
+        <button class="btn btn-break-end"   onclick="breakEnd('${s.id}')"   ${(!today||!onBreak)?'disabled':''}>휴식 종료</button>
       </div>
       <div class="memo-row">
         <input type="text" placeholder="메모 (특이사항 등)" value="${rec.memo||''}"
@@ -476,11 +601,16 @@ function renderLog() {
     return;
   }
   list.innerHTML = entries.map(s => {
-    const h = calcHours(s.rec.in, s.rec.out);
+    const actual = fmtMin(actualMin(s.rec));
+    const bMin = totalBreakMin(s.rec);
+    const bStr = bMin > 0 ? `휴식 ${fmtMin(bMin)}` : '';
+    const onBreak = isOnBreak(s.rec);
+    let detail = `${s.rec.in||'?'} → ${s.rec.out || (onBreak ? '휴식중' : '근무중')}`;
     return `<div class="log-item">
       <span class="log-name">${s.name}</span>
-      <span class="log-detail">${s.rec.in||'?'} → ${s.rec.out||'근무중'}</span>
-      <span class="log-hours">${h||'진행중'}</span>
+      <span class="log-detail">${detail}</span>
+      <span class="log-break">${bStr}</span>
+      <span class="log-hours">${actual || (onBreak ? '휴식중' : '진행중')}</span>
     </div>`;
   }).join('');
 }
