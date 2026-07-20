@@ -253,6 +253,27 @@
   .loc-far     { color: #f44336; background: #ffebee; }
   .loc-loading { color: #ff9800; background: #fff3e0; }
   .loc-error   { color: #9e8a7e; background: #f5f0eb; }
+
+/* ══ 데스크톱 반응형 (추가 전용) ══ */
+@media (min-width:768px){
+  body{padding:24px 32px}
+  .staff-grid{max-width:720px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .log-section{max-width:720px}
+  .location-status{max-width:720px}
+  header h1{font-size:23px}
+}
+@media (min-width:1024px){
+  body{padding:28px 40px}
+  .staff-grid{max-width:1040px;grid-template-columns:repeat(3,1fr);gap:16px}
+  .log-section{max-width:1040px}
+  .location-status{max-width:1040px}
+  .date-nav{max-width:1040px;margin-left:auto;margin-right:auto}
+  header h1{font-size:26px}
+}
+@media (min-width:1440px){
+  .staff-grid{max-width:1280px;grid-template-columns:repeat(4,1fr)}
+  .log-section,.location-status,.date-nav{max-width:1280px}
+}
 </style>
 </head>
 <body>
