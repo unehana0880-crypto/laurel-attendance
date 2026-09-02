@@ -7,277 +7,115 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
     background: #f5f0eb;
     min-height: 100vh;
     padding: 20px;
   }
-  header {
-    text-align: center;
-    padding: 20px 0 28px;
-  }
-  header h1 {
-    font-size: 20px;
-    color: #3b2e2e;
-    letter-spacing: 2px;
-    font-weight: 600;
-  }
-  header p {
-    font-size: 12px;
-    color: #9e8a7e;
-    margin-top: 4px;
-    letter-spacing: 1px;
-  }
-
-  .date-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  .date-nav button {
-    background: none;
-    border: 1px solid #c9b8a8;
-    border-radius: 50%;
-    width: 32px; height: 32px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #6b5344;
-  }
-  .date-nav .date-label {
-    font-size: 15px;
-    font-weight: 600;
-    color: #3b2e2e;
-    min-width: 130px;
-    text-align: center;
-  }
-  .today-btn {
-    font-size: 11px;
-    padding: 4px 10px;
-    border: 1px solid #c9b8a8;
-    border-radius: 12px;
-    background: white;
-    color: #6b5344;
-    cursor: pointer;
-  }
-
-  .staff-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-  .staff-card {
-    background: white;
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .staff-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .staff-name {
-    font-size: 16px;
-    font-weight: 600;
-    color: #3b2e2e;
-  }
-  .staff-role {
-    font-size: 11px;
-    color: #9e8a7e;
-    margin-top: 2px;
-  }
-  .status-badge {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
+  header { text-align: center; padding: 20px 0 28px; }
+  header h1 { font-size: 20px; color: #3b2e2e; letter-spacing: 2px; font-weight: 600; }
+  header p { font-size: 12px; color: #9e8a7e; margin-top: 4px; letter-spacing: 1px; }
+  .date-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .date-nav button { background: none; border: 1px solid #c9b8a8; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: #6b5344; }
+  .date-nav .date-label { font-size: 15px; font-weight: 600; color: #3b2e2e; min-width: 130px; text-align: center; }
+  .today-btn { font-size: 11px; padding: 4px 10px; border: 1px solid #c9b8a8; border-radius: 12px; background: white; color: #6b5344; cursor: pointer; }
+  .staff-grid { display: flex; flex-direction: column; gap: 12px; max-width: 480px; margin: 0 auto; }
+  .staff-card { background: white; border-radius: 16px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .staff-card.me { box-shadow: 0 2px 8px rgba(0,0,0,0.06), inset 4px 0 0 #4caf50; }
+  .staff-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .staff-name { font-size: 16px; font-weight: 600; color: #3b2e2e; }
+  .staff-role { font-size: 11px; color: #9e8a7e; margin-top: 2px; }
+  .status-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
   .status-off    { background: #f0ebe5; color: #9e8a7e; }
   .status-in     { background: #e8f5e9; color: #388e3c; }
   .status-break  { background: #fff3e0; color: #ef6c00; }
   .status-out    { background: #e3f2fd; color: #1565c0; }
-
-  .time-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .time-box {
-    flex: 1;
-    background: #faf8f5;
-    border-radius: 10px;
-    padding: 10px 12px;
-    text-align: center;
-  }
-  .time-box label {
-    font-size: 10px;
-    color: #9e8a7e;
-    display: block;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-  }
-  .time-box .time-val {
-    font-size: 18px;
-    font-weight: 700;
-    color: #3b2e2e;
-    letter-spacing: 1px;
-  }
-  .time-box .time-val.empty {
-    color: #d4c5b8;
-    font-size: 14px;
-    font-weight: 400;
-  }
+  .status-miss   { background: #ffebee; color: #c62828; }
+  .time-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .time-box { flex: 1; background: #faf8f5; border-radius: 10px; padding: 10px 12px; text-align: center; }
+  .time-box label { font-size: 10px; color: #9e8a7e; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
+  .time-box .time-val { font-size: 18px; font-weight: 700; color: #3b2e2e; letter-spacing: 1px; }
+  .time-box .time-val.empty { color: #d4c5b8; font-size: 14px; font-weight: 400; }
   .time-box.break-box { background: #fdf6ee; }
   .time-box.break-box .time-val { color: #ef6c00; }
   .time-box.actual-box { background: #f0f4ee; }
   .time-box.actual-box .time-val { color: #4a7c2f; }
-
-  /* 휴식 상세 목록 */
-  .break-detail {
-    background: #fdf6ee;
-    border-radius: 10px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 11px;
-    color: #b07d4a;
-  }
-  .break-detail .break-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
-  }
-  .break-detail .break-line:not(:last-child) {
-    border-bottom: 1px dashed #f0e0cd;
-  }
-
-  .btn-row {
-    display: flex;
-    gap: 8px;
-  }
+  .break-detail { background: #fdf6ee; border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: #b07d4a; }
+  .break-detail .break-line { display: flex; justify-content: space-between; padding: 2px 0; }
+  .break-detail .break-line:not(:last-child) { border-bottom: 1px dashed #f0e0cd; }
+  .loc-line { font-size: 10.5px; color: #9e8a7e; margin: -2px 0 10px; text-align: center; }
+  .loc-line b { color: #4a7c2f; font-weight: 600; }
+  .loc-line .warn { color: #c62828; font-weight: 600; }
+  .btn-row { display: flex; gap: 8px; }
   .btn-row + .btn-row { margin-top: 8px; }
-  .btn {
-    flex: 1;
-    padding: 11px;
-    border: none;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    letter-spacing: 0.5px;
-  }
+  .btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.5px; font-family: inherit; }
   .btn:disabled { opacity: 0.35; cursor: default; }
   .btn-in  { background: #4caf50; color: white; }
   .btn-out { background: #2196f3; color: white; }
   .btn-break-start { background: #ff9800; color: white; }
   .btn-break-end   { background: #f57c00; color: white; }
   .btn-reset { background: #f5f0eb; color: #9e8a7e; border: 1px solid #e0d5cc; flex: 0 0 auto; padding: 11px 14px; }
-
-  .memo-row {
-    margin-top: 10px;
-  }
-  .memo-row input {
-    width: 100%;
-    border: 1px solid #e8ddd5;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 12px;
-    color: #3b2e2e;
-    background: #faf8f5;
-    outline: none;
-  }
+  .btn-fix { background: #fff; color: #c62828; border: 1.5px solid #f3c9c9; }
+  .memo-row { margin-top: 10px; }
+  .memo-row input { width: 100%; border: 1px solid #e8ddd5; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #3b2e2e; background: #faf8f5; outline: none; font-family: inherit; }
   .memo-row input:focus { border-color: #c9b8a8; }
-
-  .log-section {
-    max-width: 480px;
-    margin: 24px auto 0;
-    background: white;
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .log-section h3 {
-    font-size: 13px;
-    color: #9e8a7e;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
-  }
-  .log-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f5f0eb;
-    font-size: 13px;
-  }
+  .log-section { max-width: 480px; margin: 24px auto 0; background: white; border-radius: 16px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .log-section h3 { font-size: 13px; color: #9e8a7e; margin-bottom: 12px; letter-spacing: 1px; }
+  .log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f0eb; font-size: 13px; }
   .log-item:last-child { border-bottom: none; }
   .log-name { color: #3b2e2e; font-weight: 500; flex: 0 0 56px; }
   .log-detail { color: #9e8a7e; font-size: 12px; flex: 1; text-align: center; }
   .log-break { color: #ef6c00; font-size: 11px; flex: 0 0 auto; margin-right: 10px; }
   .log-hours { color: #6b5344; font-weight: 600; flex: 0 0 auto; }
   .no-log { color: #d4c5b8; font-size: 13px; text-align: center; padding: 12px 0; }
-
-  .conn-status {
-    text-align: center;
-    font-size: 11px;
-    margin-bottom: 16px;
-    padding: 6px;
-    border-radius: 8px;
-  }
+  .conn-status { text-align: center; font-size: 11px; margin-bottom: 16px; padding: 6px; border-radius: 8px; }
   .conn-ok  { color: #4caf50; background: #e8f5e9; }
   .conn-err { color: #f44336; background: #ffebee; }
   .conn-ing { color: #ff9800; background: #fff3e0; }
-
-  .sync-time {
-    text-align: center;
-    font-size: 10px;
-    color: #c9b8a8;
-    margin-top: 16px;
-    margin-bottom: 8px;
-  }
-
-  .location-status {
-    text-align: center;
-    font-size: 11px;
-    margin: 0 auto 12px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    max-width: 480px;
-  }
+  .sync-time { text-align: center; font-size: 10px; color: #c9b8a8; margin-top: 16px; margin-bottom: 8px; }
+  .location-status { text-align: center; font-size: 11px; margin: 0 auto 12px; padding: 6px 12px; border-radius: 8px; max-width: 480px; }
   .loc-ok      { color: #4caf50; background: #e8f5e9; }
   .loc-far     { color: #f44336; background: #ffebee; }
   .loc-loading { color: #ff9800; background: #fff3e0; }
   .loc-error   { color: #9e8a7e; background: #f5f0eb; }
 
-/* ══ 데스크톱 반응형 (추가 전용) ══ */
-@media (min-width:768px){
-  body{padding:24px 32px}
-  .staff-grid{max-width:720px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .log-section{max-width:720px}
-  .location-status{max-width:720px}
-  header h1{font-size:23px}
-}
-@media (min-width:1024px){
-  body{padding:28px 40px}
-  .staff-grid{max-width:1040px;grid-template-columns:repeat(3,1fr);gap:16px}
-  .log-section{max-width:1040px}
-  .location-status{max-width:1040px}
-  .date-nav{max-width:1040px;margin-left:auto;margin-right:auto}
-  header h1{font-size:26px}
-}
-@media (min-width:1440px){
-  .staff-grid{max-width:1280px;grid-template-columns:repeat(4,1fr)}
-  .log-section,.location-status,.date-nav{max-width:1280px}
-}
+  /* ── 앱 이동 ── */
+  .applinks { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; max-width: 480px; margin: 0 auto 14px; }
+  .applinks a { display: inline-flex; align-items: center; gap: 5px; padding: 9px 14px; border-radius: 999px;
+                border: 1.5px solid #e0d5cc; background: #fff; color: #9e8a7e;
+                font-family: inherit; font-size: 12.5px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .applinks a:active { background: #3b2e2e; color: #fff; border-color: #3b2e2e; }
+
+  /* ── 퇴근 미기록 알림 ── */
+  .missbox { max-width: 480px; margin: 0 auto 14px; background: #fff4f4; border: 1.5px solid #f3c9c9;
+             border-radius: 14px; padding: 13px 16px; }
+  .missbox h4 { font-size: 12.5px; color: #c62828; margin-bottom: 7px; font-weight: 700; }
+  .missbox .mrow { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12.5px; color: #7a3330; }
+  .missbox .mrow b { font-weight: 700; }
+  .missbox .go { margin-left: auto; font-size: 11px; padding: 5px 11px; border-radius: 8px;
+                 border: 1px solid #f3c9c9; background: #fff; color: #c62828; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .missbox .hint { font-size: 11px; color: #b07d7d; margin-top: 6px; line-height: 1.5; }
+
+  @media (min-width:768px){
+    body{padding:24px 32px}
+    .staff-grid{max-width:720px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .log-section,.location-status,.applinks,.missbox{max-width:720px}
+    header h1{font-size:23px}
+  }
+  @media (min-width:1024px){
+    body{padding:28px 40px}
+    .staff-grid{max-width:1040px;grid-template-columns:repeat(3,1fr);gap:16px}
+    .log-section,.location-status,.applinks,.missbox{max-width:1040px}
+    .date-nav{max-width:1040px;margin-left:auto;margin-right:auto}
+    header h1{font-size:26px}
+  }
+  @media (min-width:1440px){
+    .staff-grid{max-width:1280px;grid-template-columns:repeat(4,1fr)}
+    .log-section,.location-status,.date-nav,.applinks,.missbox{max-width:1280px}
+  }
 </style>
 </head>
 <body>
-
 <header>
   <h1>🌿 LAUREL STUDIO</h1>
   <p>근태 관리</p>
@@ -285,6 +123,13 @@
 
 <div class="conn-status conn-ing" id="connStatus">Firebase 연결 중...</div>
 <div class="location-status loc-loading" id="locStatus">📍 위치 확인 중...</div>
+
+<div class="applinks">
+  <a href="https://unehana0880-crypto.github.io/laurel-schedule/">📅 근무 스케줄</a>
+  <a href="https://unehana0880-crypto.github.io/laurel-staff/">🧽 오늘 루틴</a>
+</div>
+
+<div class="missbox" id="missBox" style="display:none"></div>
 
 <div class="date-nav">
   <button onclick="changeDate(-1)">‹</button>
@@ -299,7 +144,6 @@
   <h3>📋 당일 요약</h3>
   <div id="logList"><p class="no-log">기록 없음</p></div>
 </div>
-
 <div class="sync-time" id="syncTime"></div>
 
 <script type="module">
@@ -316,16 +160,15 @@ const firebaseConfig = {
   appId: "1:516403607342:web:5389cdfe397afcee1cacbf",
   measurementId: "G-JXJVBBYW9P"
 };
-
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// ── 로렐 스튜디오 정확한 위치 ─────────────
+/* ═══════ 매장 위치 ═══════ */
 const STUDIO_LAT = 37.555559;
 const STUDIO_LNG = 126.920661;
 const ALLOWED_RADIUS_M = 200;
 
-let isNearStudio = false;
+let LOC = { ok:false, lat:null, lng:null, dist:null, err:null };   // 마지막 위치 상태
 
 function calcDistance(lat1, lng1, lat2, lng2) {
   const R = 6371000;
@@ -335,50 +178,82 @@ function calcDistance(lat1, lng1, lat2, lng2) {
             Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
-
 function checkLocation() {
   const el = document.getElementById('locStatus');
   if (!navigator.geolocation) {
-    el.textContent = '📍 GPS를 지원하지 않는 기기예요';
+    LOC = { ok:false, lat:null, lng:null, dist:null, err:'미지원' };
+    el.textContent = '📍 GPS를 지원하지 않는 기기 — 퇴근은 그대로 찍을 수 있어요';
     el.className = 'location-status loc-error';
-    isNearStudio = false;
-    renderAll();
-    return;
+    renderAll(); return;
   }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      const dist = calcDistance(pos.coords.latitude, pos.coords.longitude, STUDIO_LAT, STUDIO_LNG);
-      const distM = Math.round(dist);
-      if (dist <= ALLOWED_RADIUS_M) {
-        el.textContent = `✅ 매장 근처 확인 (${distM}m) — 출퇴근 가능`;
+      const d = calcDistance(pos.coords.latitude, pos.coords.longitude, STUDIO_LAT, STUDIO_LNG);
+      const m = Math.round(d);
+      LOC = { ok: d <= ALLOWED_RADIUS_M, lat: +pos.coords.latitude.toFixed(6),
+              lng: +pos.coords.longitude.toFixed(6), dist: m, err: null };
+      if (LOC.ok) {
+        el.textContent = `✅ 매장 근처 확인 (${m}m) — 출퇴근 가능`;
         el.className = 'location-status loc-ok';
-        isNearStudio = true;
       } else {
-        el.textContent = `🚫 매장에서 ${distM}m 떨어져 있어요 — 출퇴근 불가`;
+        el.textContent = `🚫 매장에서 ${m}m 떨어져 있어요 — 출근 불가 (퇴근은 가능)`;
         el.className = 'location-status loc-far';
-        isNearStudio = false;
       }
       renderAll();
     },
     (err) => {
-      el.textContent = '📍 위치 권한을 허용해주세요';
+      LOC = { ok:false, lat:null, lng:null, dist:null, err: err.message || '위치 실패' };
+      el.textContent = '📍 위치를 못 잡았어요 — 출근은 막히지만 퇴근은 찍을 수 있어요';
       el.className = 'location-status loc-error';
-      isNearStudio = false;
       renderAll();
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
   );
 }
-
 checkLocation();
 setInterval(checkLocation, 30000);
 
-const STAFF = [
-  { id: "yejin",  name: "배예진", role: "매니저" },
-  { id: "dawn",   name: "다운",   role: "웨이팅룸 담당" },
-  { id: "sujin",  name: "수진",   role: "매니저 (5월~)" },
-];
+/* 저장할 위치 조각 */
+function locStamp() {
+  return { lat: LOC.lat, lng: LOC.lng, dist: LOC.dist,
+           inRange: !!LOC.ok, at: nowHHMM(), err: LOC.err || null };
+}
 
+/* ═══════ 직원 명단 — 스케줄 앱과 공유 ═══════ */
+const FALLBACK_STAFF = [
+  { id:'s1', name:'혜주' }, { id:'s2', name:'진모' }, { id:'s3', name:'바비' },
+  { id:'s4', name:'예진' }, { id:'s5', name:'수진' }, { id:'s6', name:'지현' }
+];
+/* 예전 기록에만 남아 있는 키 — 그 날짜를 볼 때 카드가 뜨도록 */
+const LEGACY = { dawn:'하나(원장)', sujin:'수진', yejin:'예진' };
+
+let STAFF = FALLBACK_STAFF.slice();
+let ME = null;
+try { ME = localStorage.getItem('laurel_me') || null; } catch(e) {}
+
+onValue(ref(db, 'schedule/staff'), (snap) => {
+  const v = snap.val();
+  if (v && Object.keys(v).length) {
+    STAFF = Object.keys(v).map(k => Object.assign({ id:k }, v[k]))
+              .filter(s => s.active !== false)
+              .sort((a,b) => (a.order||99) - (b.order||99));
+  } else {
+    STAFF = FALLBACK_STAFF.slice();
+  }
+  renderAll();
+}, () => { STAFF = FALLBACK_STAFF.slice(); renderAll(); });
+
+/* 그날 기록에는 있는데 명단에 없는 사람(옛 직원)도 카드로 보여주기 */
+function staffForDay() {
+  const list = STAFF.slice();
+  const have = {}; list.forEach(s => have[s.id] = 1);
+  Object.keys(dayData || {}).forEach(k => {
+    if (!have[k]) list.push({ id:k, name: LEGACY[k] || k, gone:true });
+  });
+  return list;
+}
+
+/* ═══════ 날짜 ═══════ */
 let currentDate = new Date();
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -387,60 +262,81 @@ function dateDisplay(d) {
   const days = ['일','월','화','수','목','금','토'];
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
 }
-function isToday(d) {
-  const t = new Date();
-  return dateKey(d) === dateKey(t);
-}
+function isToday(d) { return dateKey(d) === dateKey(new Date()); }
+window.changeDate = (delta) => { currentDate.setDate(currentDate.getDate() + delta); watchDay(); };
+window.goToday    = () => { currentDate = new Date(); watchDay(); };
+window.goDate     = (key) => { currentDate = new Date(key + 'T00:00:00'); watchDay(); };
 
-window.changeDate = (delta) => {
-  currentDate.setDate(currentDate.getDate() + delta);
-  loadDay();
-};
-window.goToday = () => { currentDate = new Date(); loadDay(); };
-
+/* ═══════ 데이터 ═══════ */
 let dayData = {};
+let stopDay = null;
 
-function dbPath(staffId) {
-  return `attendance/${dateKey(currentDate)}/${staffId}`;
+function watchDay() {
+  document.getElementById('dateLabel').textContent = dateDisplay(currentDate);
+  if (typeof stopDay === 'function') { try { stopDay(); } catch(e) {} }
+  stopDay = onValue(ref(db, `attendance/${dateKey(currentDate)}`), (snap) => {
+    dayData = snap.val() || {};
+    renderAll();
+  }, (e) => { console.error('[laurel] 근태 구독 실패', e); });
 }
 
 async function saveRecord(staffId) {
   const r = dayData[staffId] || {};
-  await set(ref(db, dbPath(staffId)), r);
-  updateSyncTime();
+  try {
+    await set(ref(db, `attendance/${dateKey(currentDate)}/${staffId}`), r);
+    updateSyncTime();
+  } catch(e) {
+    alert('저장이 안 됐어요 — 인터넷을 확인하고 다시 눌러주세요');
+    console.error(e);
+  }
 }
 
-async function loadDay() {
-  document.getElementById('dateLabel').textContent = dateDisplay(currentDate);
-  const snap = await get(ref(db, `attendance/${dateKey(currentDate)}`));
-  dayData = snap.exists() ? snap.val() : {};
-  renderAll();
-}
-
+/* ═══════ 출퇴근 ═══════ */
 window.clockIn = (staffId) => {
-  if (!isNearStudio) { alert('📍 매장 근처에서만 출근 체크가 가능해요!'); return; }
+  if (!LOC.ok) { alert('📍 매장 근처에서만 출근 체크가 가능해요!'); return; }
   if (!dayData[staffId]) dayData[staffId] = {};
-  dayData[staffId].in = nowHHMM();
-  saveRecord(staffId);
-  renderAll();
+  dayData[staffId].in    = nowHHMM();
+  dayData[staffId].inLoc = locStamp();
+  saveRecord(staffId); renderAll();
 };
+
+/* 퇴근은 위치를 못 잡아도 허용 — 대신 위치 상태를 그대로 남깁니다 */
 window.clockOut = (staffId) => {
-  if (!isNearStudio) { alert('📍 매장 근처에서만 퇴근 체크가 가능해요!'); return; }
   const rec = dayData[staffId] || {};
-  // 휴식 중이면 퇴근 막기
-  if (isOnBreak(rec)) {
-    alert('☕ 휴식 중이에요. "휴식 종료"를 먼저 눌러주세요!');
-    return;
+  if (isOnBreak(rec)) { alert('☕ 휴식 중이에요. "휴식 종료"를 먼저 눌러주세요!'); return; }
+  if (!LOC.ok) {
+    const msg = LOC.dist != null
+      ? `매장에서 ${LOC.dist}m 떨어져 있습니다.\n그래도 퇴근으로 기록할까요?\n(기록에 "매장 밖"으로 남습니다)`
+      : `위치를 확인하지 못했습니다.\n그래도 퇴근으로 기록할까요?\n(기록에 "위치 확인 안 됨"으로 남습니다)`;
+    if (!confirm(msg)) return;
   }
   if (!dayData[staffId]) dayData[staffId] = {};
-  dayData[staffId].out = nowHHMM();
-  saveRecord(staffId);
-  renderAll();
+  dayData[staffId].out    = nowHHMM();
+  dayData[staffId].outLoc = locStamp();
+  saveRecord(staffId); renderAll();
 };
 
-// ── 휴식 기능 ──────────────────────────────
+/* 지난 날짜 퇴근 시간 채워넣기 */
+window.fixOut = (staffId) => {
+  const s = staffForDay().find(x => x.id === staffId) || { name: staffId };
+  const rec = dayData[staffId] || {};
+  const v = prompt(`${s.name} — ${dateKey(currentDate)} 퇴근 시각을 입력해주세요.\n예) 18:30`,
+                   rec.out || '18:00');
+  if (v === null) return;
+  const t = String(v).trim();
+  if (!/^\d{1,2}:\d{2}$/.test(t)) { alert('시:분 형식으로 넣어주세요. 예) 18:30'); return; }
+  const [h, m] = t.split(':').map(Number);
+  if (h > 23 || m > 59) { alert('시간이 올바르지 않아요.'); return; }
+  const hhmm = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  if (rec.in && toMin(hhmm) <= toMin(rec.in)) { alert('출근 시각보다 빠릅니다.'); return; }
+  if (!dayData[staffId]) dayData[staffId] = {};
+  dayData[staffId].out    = hhmm;
+  dayData[staffId].outLoc = { lat:null, lng:null, dist:null, inRange:null, at:null, manual:true };
+  saveRecord(staffId); renderAll();
+};
+
+/* ═══════ 휴식 ═══════ */
 window.breakStart = (staffId) => {
-  if (!isNearStudio) { alert('📍 매장 근처에서만 휴식 체크가 가능해요!'); return; }
   const rec = dayData[staffId] || {};
   if (!rec.in)  { alert('출근 후에 휴식을 시작할 수 있어요!'); return; }
   if (rec.out)  { alert('이미 퇴근한 기록이에요.'); return; }
@@ -448,51 +344,47 @@ window.breakStart = (staffId) => {
   if (!dayData[staffId]) dayData[staffId] = {};
   if (!dayData[staffId].breaks) dayData[staffId].breaks = [];
   dayData[staffId].breaks.push({ start: nowHHMM(), end: null });
-  saveRecord(staffId);
-  renderAll();
+  saveRecord(staffId); renderAll();
 };
 window.breakEnd = (staffId) => {
-  if (!isNearStudio) { alert('📍 매장 근처에서만 휴식 체크가 가능해요!'); return; }
   const rec = dayData[staffId] || {};
   if (!isOnBreak(rec)) { alert('진행 중인 휴식이 없어요.'); return; }
-  const last = rec.breaks[rec.breaks.length - 1];
-  last.end = nowHHMM();
-  saveRecord(staffId);
-  renderAll();
+  rec.breaks[rec.breaks.length - 1].end = nowHHMM();
+  saveRecord(staffId); renderAll();
 };
-
-// 현재 휴식 중인지 (마지막 휴식 기록에 end가 없으면 휴식 중)
 function isOnBreak(rec) {
   if (!rec.breaks || !rec.breaks.length) return false;
   const last = rec.breaks[rec.breaks.length - 1];
-  return last && last.start && !last.end;
+  return !!(last && last.start && !last.end);
 }
 
 window.resetRecord = (staffId) => {
-  if (!confirm(`${STAFF.find(s=>s.id===staffId).name} 기록을 초기화할까요?`)) return;
+  const s = staffForDay().find(x => x.id === staffId) || { name: staffId };
+  if (!confirm(`${s.name} 님의 ${dateKey(currentDate)} 기록을 지웁니다.\n출근·퇴근·휴식이 모두 사라집니다. 계속할까요?`)) return;
   dayData[staffId] = {};
-  saveRecord(staffId);
-  renderAll();
+  saveRecord(staffId); renderAll();
 };
 window.saveMemo = (staffId, val) => {
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].memo = val;
   saveRecord(staffId);
 };
+window.pickMe = (staffId) => {
+  ME = (ME === staffId) ? null : staffId;
+  try { ME ? localStorage.setItem('laurel_me', ME) : localStorage.removeItem('laurel_me'); } catch(e) {}
+  renderAll();
+};
 
+/* ═══════ 시간 계산 ═══════ */
 function nowHHMM() {
   const n = new Date();
   return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
 }
-
-// 분 단위로 변환
 function toMin(hhmm) {
   if (!hhmm) return null;
-  const [h, m] = hhmm.split(':').map(Number);
-  return h*60 + m;
+  const p = String(hhmm).split(':'); const h = +p[0], m = +p[1];
+  return (isNaN(h) || isNaN(m)) ? null : h*60 + m;
 }
-
-// 분 → "Xh Ym" 표기
 function fmtMin(diff) {
   if (diff == null || diff <= 0) return null;
   const h = Math.floor(diff/60), m = diff%60;
@@ -500,101 +392,101 @@ function fmtMin(diff) {
   if (h)      return `${h}h`;
   return `${m}m`;
 }
-
-// 총 휴식 시간(분) — 완료된 휴식만 합산
 function totalBreakMin(rec) {
   if (!rec.breaks || !rec.breaks.length) return 0;
   let sum = 0;
   rec.breaks.forEach(b => {
-    const s = toMin(b.start), e = toMin(b.end);
+    const s = toMin(b && b.start), e = toMin(b && b.end);
     if (s != null && e != null && e > s) sum += (e - s);
   });
   return sum;
 }
-
-// 전체 근무시간(분) = 퇴근 - 출근
 function grossMin(rec) {
   const s = toMin(rec.in), e = toMin(rec.out);
   if (s == null || e == null || e <= s) return null;
   return e - s;
 }
-
-// 실근무시간(분) = 전체 - 휴식
 function actualMin(rec) {
   const g = grossMin(rec);
-  if (g == null) return null;
-  return Math.max(0, g - totalBreakMin(rec));
+  return g == null ? null : Math.max(0, g - totalBreakMin(rec));
+}
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function renderAll() {
-  renderCards();
-  renderLog();
+/* ═══════ 그리기 ═══════ */
+function renderAll() { renderCards(); renderLog(); renderMissing(); }
+
+function locText(rec) {
+  const bits = [];
+  if (rec.inLoc) {
+    const L = rec.inLoc;
+    bits.push('출근 ' + (L.inRange ? `<b>매장 안${L.dist!=null?' '+L.dist+'m':''}</b>`
+                                   : `<span class="warn">${L.dist!=null?L.dist+'m 밖':'위치 없음'}</span>`));
+  }
+  if (rec.outLoc) {
+    const L = rec.outLoc;
+    bits.push('퇴근 ' + (L.manual ? '<span class="warn">직접 입력</span>'
+              : (L.inRange ? `<b>매장 안${L.dist!=null?' '+L.dist+'m':''}</b>`
+                           : `<span class="warn">${L.dist!=null?L.dist+'m 밖':'위치 없음'}</span>`)));
+  }
+  return bits.length ? `<div class="loc-line">📍 ${bits.join(' · ')}</div>` : '';
 }
 
 function renderCards() {
   const grid = document.getElementById('staffGrid');
-  grid.innerHTML = '';
   const today = isToday(currentDate);
+  const past  = dateKey(currentDate) < dateKey(new Date());
+  const html = [];
 
-  STAFF.forEach(s => {
+  staffForDay().forEach(s => {
     const rec = dayData[s.id] || {};
-    const hasIn  = !!rec.in;
-    const hasOut = !!rec.out;
-    const onBreak = isOnBreak(rec);
+    const hasIn = !!rec.in, hasOut = !!rec.out, onBreak = isOnBreak(rec);
 
-    let statusClass = 'status-off', statusText = '미출근';
-    if (hasIn && hasOut)      { statusClass='status-out';   statusText='퇴근'; }
-    else if (onBreak)         { statusClass='status-break'; statusText='휴식중'; }
-    else if (hasIn)           { statusClass='status-in';    statusText='근무중'; }
+    let cls = 'status-off', txt = '미출근';
+    if (hasIn && hasOut)  { cls='status-out';  txt='퇴근'; }
+    else if (onBreak)     { cls='status-break';txt='휴식중'; }
+    else if (hasIn && past){ cls='status-miss'; txt='퇴근 안 찍음'; }
+    else if (hasIn)       { cls='status-in';   txt='근무중'; }
 
-    const breakMin = totalBreakMin(rec);
-    const breakStr = breakMin > 0 ? fmtMin(breakMin) : null;
-    const actualStr = fmtMin(actualMin(rec));
+    const bMin = totalBreakMin(rec);
+    const bStr = bMin > 0 ? fmtMin(bMin) : null;
+    const aStr = fmtMin(actualMin(rec));
 
-    // 휴식 상세 줄
-    let breakDetailHTML = '';
+    let brk = '';
     if (rec.breaks && rec.breaks.length) {
-      const lines = rec.breaks.map((b, i) => {
-        const dur = (toMin(b.start)!=null && toMin(b.end)!=null && toMin(b.end)>toMin(b.start))
-                    ? fmtMin(toMin(b.end)-toMin(b.start)) : '진행중';
-        return `<div class="break-line">
-          <span>☕ 휴식 ${i+1}</span>
-          <span>${b.start || '?'} → ${b.end || '진행중'} &nbsp;(${dur})</span>
-        </div>`;
-      }).join('');
-      breakDetailHTML = `<div class="break-detail">${lines}</div>`;
+      brk = '<div class="break-detail">' + rec.breaks.map((b, i) => {
+        const s0 = toMin(b && b.start), e0 = toMin(b && b.end);
+        const dur = (s0 != null && e0 != null && e0 > s0) ? fmtMin(e0 - s0) : '진행중';
+        return `<div class="break-line"><span>☕ 휴식 ${i+1}</span>` +
+               `<span>${esc(b.start||'?')} → ${esc(b.end||'진행중')} &nbsp;(${dur})</span></div>`;
+      }).join('') + '</div>';
     }
 
-    grid.innerHTML += `
-    <div class="staff-card">
+    html.push(`
+    <div class="staff-card${ME===s.id?' me':''}">
       <div class="staff-header">
-        <div>
-          <div class="staff-name">${s.name}</div>
-          <div class="staff-role">${s.role}</div>
+        <div onclick="pickMe('${s.id}')" style="cursor:pointer">
+          <div class="staff-name">${esc(s.name)}${ME===s.id?' <span style="font-size:11px;color:#4caf50">· 나</span>':''}</div>
+          <div class="staff-role">${s.gone ? '이전 직원' : (ME===s.id ? '탭하면 해제' : '탭해서 내 카드로')}</div>
         </div>
-        <span class="status-badge ${statusClass}">${statusText}</span>
+        <span class="status-badge ${cls}">${txt}</span>
       </div>
       <div class="time-row">
-        <div class="time-box">
-          <label>출근</label>
-          <div class="time-val ${hasIn?'':'empty'}">${rec.in || '- -'}</div>
-        </div>
-        <div class="time-box">
-          <label>퇴근</label>
-          <div class="time-val ${hasOut?'':'empty'}">${rec.out || '- -'}</div>
-        </div>
+        <div class="time-box"><label>출근</label>
+          <div class="time-val ${hasIn?'':'empty'}">${esc(rec.in || '- -')}</div></div>
+        <div class="time-box"><label>퇴근</label>
+          <div class="time-val ${hasOut?'':'empty'}">${esc(rec.out || '- -')}</div></div>
       </div>
       <div class="time-row">
-        <div class="time-box break-box">
-          <label>휴식 합계</label>
-          <div class="time-val ${breakStr?'':'empty'}">${breakStr || '- -'}</div>
-        </div>
-        <div class="time-box actual-box">
-          <label>실근무시간</label>
-          <div class="time-val ${actualStr?'':'empty'}">${actualStr || '- -'}</div>
-        </div>
+        <div class="time-box break-box"><label>휴식 합계</label>
+          <div class="time-val ${bStr?'':'empty'}">${bStr || '- -'}</div></div>
+        <div class="time-box actual-box"><label>실근무시간</label>
+          <div class="time-val ${aStr?'':'empty'}">${aStr || '- -'}</div></div>
       </div>
-      ${breakDetailHTML}
+      ${locText(rec)}
+      ${brk}
       <div class="btn-row">
         <button class="btn btn-in"  onclick="clockIn('${s.id}')"  ${(!today||hasIn)?'disabled':''}>출근</button>
         <button class="btn btn-out" onclick="clockOut('${s.id}')" ${(!today||!hasIn||hasOut||onBreak)?'disabled':''}>퇴근</button>
@@ -604,55 +496,86 @@ function renderCards() {
         <button class="btn btn-break-start" onclick="breakStart('${s.id}')" ${(!today||!hasIn||hasOut||onBreak)?'disabled':''}>휴식 시작</button>
         <button class="btn btn-break-end"   onclick="breakEnd('${s.id}')"   ${(!today||!onBreak)?'disabled':''}>휴식 종료</button>
       </div>
+      ${(past && hasIn && !hasOut) ? `<div class="btn-row">
+        <button class="btn btn-fix" onclick="fixOut('${s.id}')">퇴근 시각 직접 입력</button></div>` : ''}
       <div class="memo-row">
-        <input type="text" placeholder="메모 (특이사항 등)" value="${rec.memo||''}"
+        <input type="text" placeholder="메모 (특이사항 등)" value="${esc(rec.memo||'')}"
           onblur="saveMemo('${s.id}', this.value)"
           onkeydown="if(event.key==='Enter') this.blur()">
       </div>
-    </div>`;
+    </div>`);
   });
+  grid.innerHTML = html.join('');
 }
 
 function renderLog() {
   const list = document.getElementById('logList');
-  const entries = STAFF.map(s => ({ ...s, rec: dayData[s.id]||{} }))
-                       .filter(s => s.rec.in || s.rec.out);
-  if (!entries.length) {
-    list.innerHTML = '<p class="no-log">기록 없음</p>';
-    return;
-  }
-  list.innerHTML = entries.map(s => {
-    const actual = fmtMin(actualMin(s.rec));
+  const rows = staffForDay().map(s => ({ ...s, rec: dayData[s.id] || {} }))
+                            .filter(s => s.rec.in || s.rec.out);
+  if (!rows.length) { list.innerHTML = '<p class="no-log">기록 없음</p>'; return; }
+  list.innerHTML = rows.map(s => {
+    const a = fmtMin(actualMin(s.rec));
     const bMin = totalBreakMin(s.rec);
-    const bStr = bMin > 0 ? `휴식 ${fmtMin(bMin)}` : '';
     const onBreak = isOnBreak(s.rec);
-    let detail = `${s.rec.in||'?'} → ${s.rec.out || (onBreak ? '휴식중' : '근무중')}`;
+    const detail = `${esc(s.rec.in||'?')} → ${esc(s.rec.out || (onBreak ? '휴식중' : '근무중'))}`;
     return `<div class="log-item">
-      <span class="log-name">${s.name}</span>
+      <span class="log-name">${esc(s.name)}</span>
       <span class="log-detail">${detail}</span>
-      <span class="log-break">${bStr}</span>
-      <span class="log-hours">${actual || (onBreak ? '휴식중' : '진행중')}</span>
+      <span class="log-break">${bMin>0 ? '휴식 '+fmtMin(bMin) : ''}</span>
+      <span class="log-hours">${a || (onBreak ? '휴식중' : '진행중')}</span>
     </div>`;
   }).join('');
 }
+
+/* ═══════ 최근 7일 퇴근 미기록 ═══════ */
+let MISS = [];
+function loadMissing() {
+  const jobs = [];
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dateKey(d);
+    jobs.push(get(ref(db, `attendance/${k}`)).then(sn => ({ k, v: sn.val() || {} })).catch(() => ({ k, v:{} })));
+  }
+  Promise.all(jobs).then(res => {
+    const out = [];
+    res.forEach(({ k, v }) => {
+      Object.keys(v).forEach(id => {
+        const r = v[id] || {};
+        if (r.in && !r.out) {
+          const s = STAFF.find(x => x.id === id);
+          out.push({ day: k, id, name: s ? s.name : (LEGACY[id] || id), in: r.in });
+        }
+      });
+    });
+    out.sort((a, b) => a.day < b.day ? 1 : -1);
+    MISS = out;
+    renderMissing();
+  });
+}
+function renderMissing() {
+  const box = document.getElementById('missBox');
+  if (!MISS.length) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  const rows = MISS.slice(0, 8).map(m =>
+    `<div class="mrow"><b>${esc(m.name)}</b> · ${esc(m.day.slice(5))} ${esc(m.in)} 출근` +
+    `<button class="go" onclick="goDate('${m.day}')">그날 보기</button></div>`).join('');
+  box.innerHTML = `<h4>⏰ 퇴근을 안 찍은 기록이 ${MISS.length}건 있습니다</h4>${rows}` +
+    `<div class="hint">그날로 이동해서 「퇴근 시각 직접 입력」으로 채워주세요. 안 채우면 근무시간이 계산되지 않습니다.</div>`;
+}
+loadMissing();
+setInterval(loadMissing, 5 * 60 * 1000);
 
 function updateSyncTime() {
   document.getElementById('syncTime').textContent =
     `마지막 저장: ${new Date().toLocaleTimeString('ko-KR')}`;
 }
-
 onValue(ref(db, '.info/connected'), (snap) => {
   const el = document.getElementById('connStatus');
-  if (snap.val()) {
-    el.textContent = '🟢 Firebase 실시간 연결됨';
-    el.className = 'conn-status conn-ok';
-  } else {
-    el.textContent = '🔴 오프라인 — 재연결 시도 중';
-    el.className = 'conn-status conn-err';
-  }
+  if (snap.val()) { el.textContent = '🟢 Firebase 실시간 연결됨'; el.className = 'conn-status conn-ok'; }
+  else            { el.textContent = '🔴 오프라인 — 재연결 시도 중'; el.className = 'conn-status conn-err'; }
 });
 
-loadDay();
+watchDay();
 </script>
 </body>
 </html>
