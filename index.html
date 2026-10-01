@@ -165,11 +165,21 @@
   .pincard .e{font-size:12.5px;color:#B94040;min-height:18px;margin-top:9px}
   .ctcard{max-width:430px;text-align:left;max-height:86vh;overflow-y:auto}
   .ctrow{display:flex;align-items:center;gap:7px;padding:10px 0;border-bottom:1px solid #efe7dd}
-  .ctrow:last-of-type{border-bottom:0}
+  .ctrow{border-bottom:0;padding-bottom:2px}
+  .ctrow2{display:flex;align-items:center;gap:6px;padding:2px 0 11px;
+    border-bottom:1px solid #efe7dd;flex-wrap:wrap}
+  .ctrow2:last-of-type{border-bottom:0}
+  .ctrow2 .hr{width:58px;padding:7px;font-size:14px;text-align:right;letter-spacing:0;
+    border:1.5px solid #e0d3c6;border-radius:9px;font-family:inherit}
+  .ctrow2 .u{font-size:11.5px;color:#8c8075;white-space:nowrap}
   .ctrow .nm{flex:1;min-width:0;font-size:15px;font-weight:600;color:#3b2e2e;
     border:none;background:none;font-family:inherit;padding:4px 0}
-  .ctrow select{padding:8px 6px;border:1.5px solid #e0d3c6;border-radius:9px;
-    font-family:inherit;font-size:13px;background:#fff;color:#3b2e2e}
+  .ctdays{display:flex;gap:3px}
+  .ctdays button{width:27px;height:29px;border:1.5px solid #e0d3c6;border-radius:7px;background:#fff;
+    font-family:inherit;font-size:12.5px;color:#a79c90;cursor:pointer;padding:0}
+  .ctdays button.on{background:#4A7C59;border-color:#4A7C59;color:#fff;font-weight:700}
+  .ctdays button.sun.on{background:#B94040;border-color:#B94040}
+  .ctdays button.sat.on{background:#4C6E8F;border-color:#4C6E8F}
   .ctrow .hr{width:62px;padding:8px;font-size:15px;text-align:right;letter-spacing:0;
     border:1.5px solid #e0d3c6;border-radius:9px;font-family:inherit}
   .ctrow .u{font-size:12.5px;color:#8c8075;white-space:nowrap}
@@ -208,8 +218,9 @@
 
 <div class="pinwrap" id="ctWrap"><div class="pincard ctcard">
   <div class="t" style="text-align:center">계약 기준 시간</div>
-  <div class="s" style="text-align:center">알바는 <b>주 단위</b>, 직원·계약직은 <b>월 단위</b>로 정합니다.<br>
-    나중에 전환하면 여기서 바꾸면 됩니다.</div>
+  <div class="s" style="text-align:center"><b>근무하는 요일</b>을 누르고 <b>하루 몇 시간</b>인지 넣으세요.<br>
+    주 기준·월 기준은 달마다 자동으로 계산됩니다.<br>
+    요일이 들쑥날쑥하면 요일을 비우고 <b>주 O일</b>만 넣으세요.</div>
   <div id="ctList"></div>
   <button class="add" onclick="ctAdd()">＋ 사람 추가</button>
   <button onclick="ctSave()">저장</button>
@@ -452,20 +463,25 @@ document.getElementById('pinIn').addEventListener('keydown', e => { if(e.key==='
 var CT = {};
 onValue(ref(db,'attendance/contract'), snap => { CT = snap.val() || {}; }, () => {});
 
+var DOW = ['일','월','화','수','목','금','토'];
+
 function ctRow(s0){
   const c = CT[s0.id] || {};
-  const mode = c.mode === 'month' ? 'month' : (c.mode === 'week' ? 'week' : '');
+  const days = Array.isArray(c.days) ? c.days : [];
   return '<div class="ctrow" data-id="'+s0.id+'">'
-    + '<input class="nm" value="'+esc(s0.name)+'" data-nm>'
-    + '<select data-mode>'
-    +   '<option value=""'      +(mode===''      ?' selected':'')+'>— 미설정</option>'
-    +   '<option value="week"'  +(mode==='week'  ?' selected':'')+'>알바 · 주</option>'
-    +   '<option value="month"' +(mode==='month' ?' selected':'')+'>직원 · 월</option>'
-    + '</select>'
+    + '<input class="nm" value="'+esc(s0.name)+'" data-nm placeholder="이름">'
+    + '</div><div class="ctrow2" data-for="'+s0.id+'">'
+    + '<div class="ctdays">'
+    +   DOW.map((d,i)=>'<button type="button" class="'+(i===0?'sun':(i===6?'sat':''))
+        +(days.indexOf(i)>=0?' on':'')+'" data-d="'+i+'" onclick="ctDay(this)">'+d+'</button>').join('')
+    + '</div>'
     + '<input class="hr" type="number" min="0" step="0.5" placeholder="—" data-hr value="'
-    +   (c.hours != null ? c.hours : '') + '">'
-    + '<span class="u">시간</span></div>';
+    +   (c.hours != null ? c.hours : '') + '"><span class="u">시간/일</span>'
+    + '<input class="hr pw" type="number" min="0" max="7" step="1" placeholder="—" data-pw value="'
+    +   (c.perWeek != null ? c.perWeek : '') + '"><span class="u">주 O일</span>'
+    + '</div>';
 }
+window.ctDay = (btn) => { btn.classList.toggle('on'); };
 window.ctOpen = () => {
   if (!BOSS) return;
   document.getElementById('ctList').innerHTML = STAFF.map(ctRow).join('');
@@ -475,16 +491,14 @@ window.ctOpen = () => {
 window.ctClose = () => { document.getElementById('ctWrap').style.display = 'none'; };
 window.ctAdd = () => {
   let max = 0;
-  STAFF.forEach(x => { const m = /^s(\d+)$/.exec(x.id); if (m) max = Math.max(max, +m[1]); });
-  Object.keys(CT).forEach(k => { const m = /^s(\d+)$/.exec(k); if (m) max = Math.max(max, +m[1]); });
-  Object.keys(STAFF_RAW).forEach(k => { const m = /^s(\d+)$/.exec(k); if (m) max = Math.max(max, +m[1]); });
+  const bump = k => { const m = /^s(\d+)$/.exec(k); if (m) max = Math.max(max, +m[1]); };
+  STAFF.forEach(x => bump(x.id));
+  Object.keys(CT).forEach(bump);
+  Object.keys(STAFF_RAW).forEach(bump);
   const id = 's' + (max + 1);
-  document.getElementById('ctList').insertAdjacentHTML('beforeend',
-    ctRow({ id:id, name:'' }).replace('value="" data-nm', 'value="" data-nm placeholder="이름"'));
+  document.getElementById('ctList').insertAdjacentHTML('beforeend', ctRow({ id:id, name:'' }));
   const rows = document.querySelectorAll('#ctList .ctrow');
-  const last = rows[rows.length-1];
-  last.setAttribute('data-new','1');
-  last.querySelector('[data-nm]').focus();
+  rows[rows.length-1].querySelector('[data-nm]').focus();
 };
 window.ctSave = async () => {
   const err = document.getElementById('ctE');
@@ -494,21 +508,25 @@ window.ctSave = async () => {
   for (const row of rows){
     const id   = row.getAttribute('data-id');
     const name = row.querySelector('[data-nm]').value.trim();
-    const mode = row.querySelector('[data-mode]').value;
-    const hrsV = row.querySelector('[data-hr]').value.trim();
+    const r2   = document.querySelector('#ctList .ctrow2[data-for="'+id+'"]');
     if (!name){ err.textContent = '이름이 비어 있는 줄이 있습니다'; return; }
-    if (mode && hrsV === ''){ err.textContent = esc(name)+' 의 기준 시간을 넣어주세요'; return; }
+    const days = Array.from(r2.querySelectorAll('.ctdays button.on')).map(b => +b.getAttribute('data-d'));
+    const hrsV = r2.querySelector('[data-hr]').value.trim();
+    const pwV  = r2.querySelector('[data-pw]').value.trim();
     if (hrsV !== ''){
       const h = parseFloat(hrsV);
-      if (isNaN(h) || h < 0 || h > 400){ err.textContent = esc(name)+' 의 시간이 이상합니다'; return; }
-      if (!mode){ err.textContent = esc(name)+' 의 구분(알바/직원)을 골라주세요'; return; }
-      contract[id] = { mode: mode, hours: h };
+      if (isNaN(h) || h <= 0 || h > 24){ err.textContent = name+' 의 하루 시간이 이상합니다'; return; }
+      if (!days.length && pwV === ''){
+        err.textContent = name+' — 요일을 고르거나 「주 O일」을 넣어주세요'; return; }
+      const pw = pwV === '' ? null : parseInt(pwV);
+      if (pw != null && (isNaN(pw) || pw < 1 || pw > 7)){
+        err.textContent = name+' 의 「주 O일」이 이상합니다'; return; }
+      contract[id] = { days: days, perWeek: days.length ? null : pw, hours: h };
     }
     order += 1;
     const old = STAFF.find(x => x.id === id) || {};
     staff[id] = { name: name, init: (old.init || name.charAt(0)), order: order, active: true };
   }
-  /* 이 화면에 없는 사람(퇴사자 등)은 원래 명단 그대로 둡니다 */
   Object.keys(STAFF_RAW).forEach(k => { if (!staff[k]) staff[k] = STAFF_RAW[k]; });
   try {
     await set(ref(db,'schedule/staff'), staff);
@@ -517,7 +535,30 @@ window.ctSave = async () => {
   } catch(e){ err.textContent = '저장이 안 됐어요 — 인터넷을 확인해주세요'; }
 };
 
-/* 화면 모드 칠하기 */
+/* 근무요일 표기 — [1,2,3,4,5] → 「월~금」 */
+function dowLabel(c){
+  if (!c) return '';
+  const d = (c.days||[]).slice().sort((a,b)=>a-b);
+  if (!d.length) return c.perWeek ? ('주 '+c.perWeek+'일') : '';
+  let seq = true;
+  for (let i=1;i<d.length;i++) if (d[i] !== d[i-1]+1) { seq = false; break; }
+  return (seq && d.length >= 3) ? (DOW[d[0]]+'~'+DOW[d[d.length-1]])
+                                : d.map(i=>DOW[i]).join('·');
+}
+/* 그 주(from~to일)에 해당하는 근무일수 */
+function workDaysIn(c, y, m, from, to){
+  if (!c) return 0;
+  const d = c.days || [];
+  if (d.length){
+    let n = 0;
+    for (let i=from; i<=to; i++) if (d.indexOf(new Date(y,m,i).getDay()) >= 0) n++;
+    return n;
+  }
+  if (c.perWeek) return c.perWeek * ((to-from+1)/7);
+  return 0;
+}
+
+/* 화면 모드 칠하기 *//* 화면 모드 칠하기 */
 function paintMode(){
   const b = document.getElementById('bossBtn');
   b.classList.toggle('on', BOSS);
@@ -1046,7 +1087,7 @@ window.exportMonth = async function(){
         c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF6B5344'}};
         c.font={bold:true,color:{argb:'FFFFFFFF'},size:9,name:'Arial'};
         c.alignment={horizontal:'center',vertical:'middle',wrapText:true}; });
-      ws.getRow(r).height=20; r++;
+      ws.getRow(r).height=26; r++;
     }
     function line(vals, opt){
       vals.forEach((v,i)=>{ const c=ws.getCell(String.fromCharCode(65+i)+r);
@@ -1054,78 +1095,77 @@ window.exportMonth = async function(){
         const col = (opt && opt.colors && opt.colors[i]) || 'FF000000';
         c.font={bold:!!(opt && opt.bold && opt.bold.indexOf(i)>=0),size:10,name:'Arial',color:{argb:col}};
         c.alignment={horizontal:'center',vertical:'middle'};
+        if (opt && opt.fill) c.fill={type:'pattern',pattern:'solid',fgColor:{argb:opt.fill}};
         if (opt && opt.money === i) c.numFmt='#,##0"원"'; });
       ws.getRow(r).height=19; r++;
     }
+    const diffTxt = d => (Math.abs(d) < 1 ? '0' : (d>0 ? '+'+fmtMin(Math.round(d)) : '-'+fmtMin(Math.round(-d))));
+    const diffCol = d => (Math.abs(d) < 1 ? 'FF000000' : (d>0 ? 'FF8A4A2E' : 'FF2F6B8A'));
+
+    const wks = weekList(y, m);
     const names = Object.keys(totals).sort();
-    const monthly = names.filter(n => (CT[totals[n].id]||{}).mode === 'month');
-    const weekly  = names.filter(n => (CT[totals[n].id]||{}).mode === 'week');
-    const none    = names.filter(n => !(CT[totals[n].id]||{}).mode);
-    const diffTxt = d => (d===0 ? '0' : (d>0 ? '+'+fmtMin(d) : '-'+fmtMin(-d)));
-    const diffCol = d => d>0 ? 'FF8A4A2E' : (d<0 ? 'FF2F6B8A' : 'FF000000');
 
-    /* ── 직원 · 계약직 (월 기준) ── */
-    if (monthly.length){
-      band('👤 직원 · 계약직 — 월 기준', 6);
-      head(['이름','월 기준','이달 근무','차이','지급액(원)','퇴근 미입력']);
-      monthly.forEach(n=>{
-        const T=totals[n], base=Math.round((CT[T.id].hours||0)*60), d=T.work-base;
-        line([n, fmtMin(base), fmtMin(T.work)||'0', diffTxt(d),
-              wage?Math.round(T.work/60*wage):0, T.miss?(T.miss+'일'):''],
-             {bold:[0,2,3], money:4, colors:{3:diffCol(d), 5:T.miss?'FFB94040':'FF000000'}});
-      });
-      r++;
-    }
+    /* ───── 주별 표 ───── */
+    band('🗓 주별 — 기준 대비 실제 근무', 4 + wks.length);
+    head(['이름','근무요일','하루','주 기준'].concat(wks.map(w=>w.label)));
+    names.forEach(n=>{
+      const T = totals[n], c = CT[T.id];
+      const perDay = c ? Math.round((c.hours||0)*60) : null;
+      /* 주 기준은 그 주에 걸린 근무일수로 계산 — 첫 주·마지막 주가 짧아도 정확 */
+      const wBase = wks.map(w => c ? workDaysIn(c, y, m, w.from, w.to) * perDay : null);
+      const full  = c ? ((c.days&&c.days.length) ? c.days.length : (c.perWeek||0)) * perDay : null;
 
-    /* ── 알바 (주 기준) ── */
-    if (weekly.length){
-      const wks = weekList(y, m);
-      band('🕐 알바 — 주 기준', 3 + wks.length + 1);
-      head(['이름','주 기준','이달 합계'].concat(wks.map(w=>w.label)).concat(['퇴근 미입력']));
-      weekly.forEach(n=>{
-        const T=totals[n], base=Math.round((CT[T.id].hours||0)*60);
-        const cells=[n, fmtMin(base), fmtMin(T.work)||'0'];
-        const cols={};
-        wks.forEach((w,i)=>{
-          const got=T.wk[w.no]||0, d=got-base;
-          cells.push(fmtMin(got)||'0');
-          if (got||d) cols[3+i]=diffCol(d);
-        });
-        cells.push(T.miss?(T.miss+'일'):'');
-        cols[3+wks.length]=T.miss?'FFB94040':'FF000000';
-        line(cells,{bold:[0,2],colors:cols});
-        /* 주별 차이 줄 */
-        const dl=['','↳ 기준 대비',''];
-        const dc={1:'FF7A726A'};
-        wks.forEach((w,i)=>{ const got=T.wk[w.no]||0; const d=got-base;
-          dl.push(got?diffTxt(d):'—'); dc[3+i]=got?diffCol(d):'FFB9B2A8'; });
-        dl.push('');
-        line(dl,{colors:dc});
+      line([n, c?dowLabel(c):'미설정', perDay?fmtMin(perDay):'—', full?fmtMin(full):'—']
+             .concat(wks.map((w,i)=> fmtMin(T.wk[w.no]||0) || '0')),
+           {bold:[0], fill:'FFFBF8F4'});
+      const d2 = ['', '↳ 그 주 기준','',''];
+      wks.forEach((w,i)=> d2.push(wBase[i]==null ? '—' : (fmtMin(Math.round(wBase[i])) || '0')));
+      line(d2, {colors:{1:'FF7A726A'}});
+      const d3 = ['', '↳ 차이','',''];
+      const c3 = {1:'FF7A726A'};
+      wks.forEach((w,i)=>{
+        if (wBase[i]==null){ d3.push('—'); c3[4+i]='FFB9B2A8'; return; }
+        const got = T.wk[w.no]||0;
+        if (!got && !wBase[i]){ d3.push(''); return; }
+        const d = got - wBase[i];
+        d3.push(diffTxt(d)); c3[4+i]=diffCol(d);
       });
-      r++;
-    }
+      line(d3, {colors:c3, bold:[]});
+    });
+    r++;
 
-    /* ── 기준 미설정 ── */
-    if (none.length){
-      band('기준 미설정 — ⚙ 계약 기준에서 넣어주세요', 5);
-      head(['이름','근무일수','이달 근무','지급액(원)','퇴근 미입력']);
-      none.forEach(n=>{ const T=totals[n];
-        line([n, T.days+'일', fmtMin(T.work)||'0', wage?Math.round(T.work/60*wage):0,
-              T.miss?(T.miss+'일'):''],
-             {bold:[0,2], money:3, colors:{4:T.miss?'FFB94040':'FF000000'}});
-      });
-      r++;
-    }
+    /* ───── 월 합계 ───── */
+    band('📊 이달 합계'+(wage?(' · 시급 '+wage.toLocaleString()+'원'):''), 8);
+    head(['이름','근무요일','이달 근무일수','월 기준','이달 실근무','차이','지급액(원)','퇴근 미입력']);
+    names.forEach(n=>{
+      const T = totals[n], c = CT[T.id];
+      const perDay = c ? Math.round((c.hours||0)*60) : null;
+      let nDays = 0;
+      if (c) wks.forEach(w => { nDays += workDaysIn(c, y, m, w.from, w.to); });
+      const base = perDay ? nDays * perDay : null;
+      const d = base==null ? null : (T.work - base);
+      line([ n, c?dowLabel(c):'미설정',
+             c ? (Math.round(nDays*10)/10 + '일') : (T.days+'일 근무'),
+             base==null ? '—' : fmtMin(Math.round(base)),
+             fmtMin(T.work) || '0',
+             d==null ? '—' : diffTxt(d),
+             wage ? Math.round(T.work/60*wage) : 0,
+             T.miss ? (T.miss+'일') : '' ],
+           { bold:[0,4,5], money:6,
+             colors:{ 5: d==null?'FFB9B2A8':diffCol(d), 7: T.miss?'FFB94040':'FF000000' } });
+    });
+    r++;
 
     ws.mergeCells('A'+r+':H'+r);
     const nc=ws.getCell('A'+r);
-    nc.value='※ 「차이」는 실제 근무시간에서 계약 기준을 뺀 값입니다. '
-           + '＋는 더 일한 시간, －는 덜 일한 시간(조기 퇴근·단축 운영 포함)입니다. '
+    nc.value='※ 기준은 「근무요일 × 하루 시간」으로 달마다 자동 계산됩니다. '
+           + '주가 걸쳐 있으면 그 주에 실제로 걸린 근무일수만 셉니다. '
+           + '「차이」의 ＋는 더 일한 시간, －는 덜 일한 시간(조기 퇴근·단축 운영 포함)입니다. '
            + '퇴근을 안 찍은 날은 시간을 알 수 없어 합계에서 빠지며 맨 오른쪽에 일수로 표시됩니다 — '
            + '원장 모드에서 그 날짜로 가 「퇴근 시각 직접 입력」으로 채워주세요.';
     nc.font={size:9.5,name:'Arial',color:{argb:'FF7A726A'}};
     nc.alignment={horizontal:'left',vertical:'middle',wrapText:true};
-    ws.getRow(r).height=32;
+    ws.getRow(r).height=34;
 
     const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
