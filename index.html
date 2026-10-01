@@ -172,6 +172,11 @@
   .ctrow2 .hr{width:58px;padding:7px;font-size:14px;text-align:right;letter-spacing:0;
     border:1.5px solid #e0d3c6;border-radius:9px;font-family:inherit}
   .ctrow2 .u{font-size:11.5px;color:#8c8075;white-space:nowrap}
+  .ctrow2 .lb{font-weight:700;color:#6b5344}
+  .ctrow2 .sep{color:#ded5c9;font-size:13px;margin:0 2px}
+  .ctrow2 .hr:disabled{background:#f2ede6;border-color:#eae3d9;color:#c3bbb0}
+  .ctrow2.haveday .pwlb{color:#cfc6ba}
+  .ctrow2.haveday .sep{color:#eee8df}
   .ctrow .nm{flex:1;min-width:0;font-size:15px;font-weight:600;color:#3b2e2e;
     border:none;background:none;font-family:inherit;padding:4px 0}
   .ctdays{display:flex;gap:3px}
@@ -475,16 +480,29 @@ function ctRow(s0){
     +   DOW.map((d,i)=>'<button type="button" class="'+(i===0?'sun':(i===6?'sat':''))
         +(days.indexOf(i)>=0?' on':'')+'" data-d="'+i+'" onclick="ctDay(this)">'+d+'</button>').join('')
     + '</div>'
-    + '<input class="hr" type="number" min="0" step="0.5" placeholder="—" data-hr value="'
-    +   (c.hours != null ? c.hours : '') + '"><span class="u">시간/일</span>'
-    + '<input class="hr pw" type="number" min="0" max="7" step="1" placeholder="—" data-pw value="'
-    +   (c.perWeek != null ? c.perWeek : '') + '"><span class="u">주 O일</span>'
+    + '<span class="u lb">하루</span>'
+    + '<input class="hr" type="number" min="0" step="0.5" placeholder="?" data-hr value="'
+    +   (c.hours != null ? c.hours : '') + '"><span class="u">시간</span>'
+    + '<span class="sep">｜</span>'
+    + '<span class="u lb pwlb">요일 불규칙이면 주</span>'
+    + '<input class="hr pw" type="number" min="1" max="7" step="1" placeholder="—" data-pw value="'
+    +   (c.perWeek != null ? c.perWeek : '') + '"><span class="u pwlb">일</span>'
     + '</div>';
 }
-window.ctDay = (btn) => { btn.classList.toggle('on'); };
+window.ctDay = (btn) => { btn.classList.toggle('on'); ctSync(btn.closest('.ctrow2')); };
+/* 요일을 하나라도 고르면 「주 O일」 칸은 쓸 일이 없으므로 꺼둡니다 */
+function ctSync(r2){
+  if (!r2) return;
+  const on = r2.querySelectorAll('.ctdays button.on').length > 0;
+  const pw = r2.querySelector('[data-pw]');
+  pw.disabled = on;
+  if (on) pw.value = '';
+  r2.classList.toggle('haveday', on);
+}
 window.ctOpen = () => {
   if (!BOSS) return;
   document.getElementById('ctList').innerHTML = STAFF.map(ctRow).join('');
+  document.querySelectorAll('#ctList .ctrow2').forEach(ctSync);
   document.getElementById('ctE').textContent = '';
   document.getElementById('ctWrap').style.display = 'flex';
 };
@@ -497,6 +515,7 @@ window.ctAdd = () => {
   Object.keys(STAFF_RAW).forEach(bump);
   const id = 's' + (max + 1);
   document.getElementById('ctList').insertAdjacentHTML('beforeend', ctRow({ id:id, name:'' }));
+  document.querySelectorAll('#ctList .ctrow2').forEach(ctSync);
   const rows = document.querySelectorAll('#ctList .ctrow');
   rows[rows.length-1].querySelector('[data-nm]').focus();
 };
