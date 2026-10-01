@@ -116,6 +116,74 @@
 </style>
 </head>
 <body>
+<style>
+  .punchwrap{max-width:460px;margin:0 auto 24px;padding:0 14px}
+  .punchcard{background:#fff;border:1px solid #e6dbd0;border-radius:18px;padding:26px 22px 24px;
+    box-shadow:0 2px 14px rgba(60,40,25,.06);text-align:center}
+  .punch-who{font-size:13px;color:#9b8e82;letter-spacing:.06em}
+  .punch-name{font-size:30px;font-weight:700;color:#3b2e2e;margin:4px 0 20px}
+  .punch-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .punch-btns .wide{grid-column:1/-1}
+  .pbtn{padding:18px 10px;border:none;border-radius:13px;font-family:inherit;font-size:17px;
+    font-weight:700;cursor:pointer;color:#fff;transition:opacity .15s}
+  .pbtn:disabled{opacity:.28;cursor:default}
+  .pbtn.in{background:#4A7C59}.pbtn.out{background:#8a5a3b}
+  .pbtn.bs{background:#B08A3E;font-size:15px}.pbtn.be{background:#6b7f8f;font-size:15px}
+  .punch-swap{margin-top:16px;font-size:12.5px;color:#9b8e82;background:none;border:none;
+    text-decoration:underline;cursor:pointer;font-family:inherit}
+  .pick-ttl{text-align:center;font-size:15px;color:#6b5344;margin-bottom:14px}
+  .pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:9px}
+  .pick-grid button{padding:17px 6px;border:1px solid #e0d3c6;border-radius:13px;background:#fff;
+    font-family:inherit;font-size:16px;font-weight:600;color:#3b2e2e;cursor:pointer}
+  .toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%) translateY(14px);
+    background:#2f2a24;color:#fff;padding:14px 22px;border-radius:30px;font-size:15px;font-weight:600;
+    z-index:9997;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;white-space:nowrap;
+    box-shadow:0 6px 22px rgba(0,0,0,.22)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .bossbar{max-width:1280px;margin:0 auto 14px;padding:0 14px;display:flex;justify-content:flex-end;gap:8px}
+  .bossbar button{padding:7px 13px;border:1px solid #d8cbbe;border-radius:11px;background:#fff;
+    font-family:inherit;font-size:12.5px;color:#6b5344;cursor:pointer}
+  .bossbar button.on{background:#3b2e2e;color:#fff;border-color:#3b2e2e}
+  .xlbar{max-width:1280px;margin:0 auto 18px;padding:0 14px;display:flex;gap:8px;align-items:center;
+    flex-wrap:wrap;justify-content:flex-end}
+  .xlbar label{font-size:12.5px;color:#6b5344}
+  .xlbar input{width:96px;padding:7px 9px;border:1px solid #d8cbbe;border-radius:9px;
+    font-family:inherit;font-size:13px;text-align:right}
+  .xlbar .dl{background:#4A7C59;color:#fff;border:none;padding:9px 15px;border-radius:11px;
+    font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .pinwrap{position:fixed;inset:0;z-index:9996;background:#f6f1ea;display:none;
+    align-items:center;justify-content:center;padding:22px}
+  .pincard{width:100%;max-width:320px;background:#fff;border:1px solid #e6dbd0;border-radius:16px;
+    padding:30px 24px;text-align:center}
+  .pincard .t{font-size:20px;font-weight:700;color:#3b2e2e;margin-bottom:5px}
+  .pincard .s{font-size:12.5px;color:#8c8075;line-height:1.6;margin-bottom:18px}
+  .pincard input{width:100%;box-sizing:border-box;padding:13px;font-size:22px;text-align:center;
+    letter-spacing:.34em;border:1.5px solid #e0d3c6;border-radius:10px;font-family:inherit}
+  .pincard button{width:100%;margin-top:11px;padding:13px;border:none;border-radius:10px;
+    background:#3b2e2e;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+  .pincard .c{margin-top:9px;background:none;color:#9b8e82;font-weight:400;font-size:12.5px}
+  .pincard .e{font-size:12.5px;color:#B94040;min-height:18px;margin-top:9px}
+  .ctcard{max-width:430px;text-align:left;max-height:86vh;overflow-y:auto}
+  .ctrow{display:flex;align-items:center;gap:7px;padding:10px 0;border-bottom:1px solid #efe7dd}
+  .ctrow:last-of-type{border-bottom:0}
+  .ctrow .nm{flex:1;min-width:0;font-size:15px;font-weight:600;color:#3b2e2e;
+    border:none;background:none;font-family:inherit;padding:4px 0}
+  .ctrow select{padding:8px 6px;border:1.5px solid #e0d3c6;border-radius:9px;
+    font-family:inherit;font-size:13px;background:#fff;color:#3b2e2e}
+  .ctrow .hr{width:62px;padding:8px;font-size:15px;text-align:right;letter-spacing:0;
+    border:1.5px solid #e0d3c6;border-radius:9px;font-family:inherit}
+  .ctrow .u{font-size:12.5px;color:#8c8075;white-space:nowrap}
+  .pincard .add{background:#fff;color:#4A7C59;border:1.5px dashed #a9c0ae;font-weight:700;margin-top:14px}
+</style>
+<div class="toast" id="toast"></div>
+<div class="pinwrap" id="pinWrap"><div class="pincard">
+  <div class="t" id="pinT">원장 모드</div>
+  <div class="s" id="pinS">PIN을 입력해 주세요.</div>
+  <input id="pinIn" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="••••">
+  <button onclick="pinSubmit()" id="pinB">열기</button>
+  <button class="c" onclick="pinClose()">취소</button>
+  <div class="e" id="pinE"></div>
+</div></div>
 <header>
   <h1>🌿 LAUREL STUDIO</h1>
   <p>근태 관리</p>
@@ -129,6 +197,27 @@
   <a href="https://unehana0880-crypto.github.io/laurel-staff/">🧽 오늘 루틴</a>
   <a href="https://unehana0880-crypto.github.io/laurel-stock/">📦 재고·시재</a>
 </div>
+
+<div class="bossbar"><button id="bossBtn" onclick="bossToggle()">👑 원장님</button></div>
+
+<div class="xlbar" id="xlBar" style="display:none">
+  <label>시급 <input id="xlWage" type="number" min="0" step="100" value="12000"> 원</label>
+  <button onclick="ctOpen()">⚙ 계약 기준</button>
+  <button class="dl" id="xlBtn" onclick="exportMonth()">📥 이달 엑셀 받기</button>
+</div>
+
+<div class="pinwrap" id="ctWrap"><div class="pincard ctcard">
+  <div class="t" style="text-align:center">계약 기준 시간</div>
+  <div class="s" style="text-align:center">알바는 <b>주 단위</b>, 직원·계약직은 <b>월 단위</b>로 정합니다.<br>
+    나중에 전환하면 여기서 바꾸면 됩니다.</div>
+  <div id="ctList"></div>
+  <button class="add" onclick="ctAdd()">＋ 사람 추가</button>
+  <button onclick="ctSave()">저장</button>
+  <button class="c" onclick="ctClose()">닫기</button>
+  <div class="e" id="ctE"></div>
+</div></div>
+
+<div class="punchwrap" id="punchWrap"></div>
 
 <div class="missbox" id="missBox" style="display:none"></div>
 
@@ -147,6 +236,7 @@
 </div>
 <div class="sync-time" id="syncTime"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -317,8 +407,175 @@ let STAFF = FALLBACK_STAFF.slice();
 let ME = null;
 try { ME = localStorage.getItem('laurel_me') || null; } catch(e) {}
 
+/* ★ 원장 모드 — 켜져 있을 때만 전체 기록이 보입니다.
+ *   직원 화면에서는 본인 것도 남의 것도 보이지 않고, 찍기만 됩니다. */
+var BOSS = false, PIN = '';
+try { BOSS = localStorage.getItem('laurel_att_boss') === '1'; } catch(e){}
+onValue(ref(db,'attendance/pin'), snap => { PIN = snap.val() || ''; }, () => {});
+
+async function sha(t){
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+window.bossToggle = () => {
+  if (BOSS){ BOSS = false; try{localStorage.removeItem('laurel_att_boss');}catch(e){}
+    currentDate = new Date(); watchDay(); paintMode(); return; }
+  const set0 = !PIN;
+  document.getElementById('pinT').textContent = set0 ? 'PIN 정하기' : '원장 모드';
+  document.getElementById('pinS').textContent = set0
+    ? '처음이라 PIN이 없습니다. 원장님만 쓸 번호를 정해주세요. (숫자 4~8자리)'
+    : 'PIN을 입력해 주세요. 직원분들은 누르지 않으셔도 됩니다.';
+  document.getElementById('pinB').textContent = set0 ? '이 번호로 정하기' : '열기';
+  document.getElementById('pinE').textContent = '';
+  document.getElementById('pinIn').value = '';
+  document.getElementById('pinWrap').style.display = 'flex';
+  setTimeout(()=>{ try{ document.getElementById('pinIn').focus(); }catch(e){} }, 80);
+};
+window.pinClose = () => { document.getElementById('pinWrap').style.display = 'none'; };
+window.pinSubmit = async () => {
+  const el = document.getElementById('pinIn'), err = document.getElementById('pinE');
+  const v = (el.value||'').trim();
+  if (!/^[0-9]{4,8}$/.test(v)){ err.textContent = '숫자 4~8자리로 입력해 주세요'; return; }
+  if (!PIN){
+    try { await set(ref(db,'attendance/pin'), await sha(v)); }
+    catch(e){ err.textContent = '저장이 안 됐어요 — 인터넷을 확인해주세요'; return; }
+    PIN = await sha(v);
+  } else if (await sha(v) !== PIN){
+    err.textContent = 'PIN이 맞지 않습니다'; el.value=''; el.focus(); return;
+  }
+  BOSS = true; try{localStorage.setItem('laurel_att_boss','1');}catch(e){}
+  pinClose(); paintMode(); renderAll();
+};
+document.getElementById('pinIn').addEventListener('keydown', e => { if(e.key==='Enter') pinSubmit(); });
+
+/* ═══ 계약 기준 — attendance/contract/{id} = {mode:'week'|'month', hours:n} ═══ */
+var CT = {};
+onValue(ref(db,'attendance/contract'), snap => { CT = snap.val() || {}; }, () => {});
+
+function ctRow(s0){
+  const c = CT[s0.id] || {};
+  const mode = c.mode === 'month' ? 'month' : (c.mode === 'week' ? 'week' : '');
+  return '<div class="ctrow" data-id="'+s0.id+'">'
+    + '<input class="nm" value="'+esc(s0.name)+'" data-nm>'
+    + '<select data-mode>'
+    +   '<option value=""'      +(mode===''      ?' selected':'')+'>— 미설정</option>'
+    +   '<option value="week"'  +(mode==='week'  ?' selected':'')+'>알바 · 주</option>'
+    +   '<option value="month"' +(mode==='month' ?' selected':'')+'>직원 · 월</option>'
+    + '</select>'
+    + '<input class="hr" type="number" min="0" step="0.5" placeholder="—" data-hr value="'
+    +   (c.hours != null ? c.hours : '') + '">'
+    + '<span class="u">시간</span></div>';
+}
+window.ctOpen = () => {
+  if (!BOSS) return;
+  document.getElementById('ctList').innerHTML = STAFF.map(ctRow).join('');
+  document.getElementById('ctE').textContent = '';
+  document.getElementById('ctWrap').style.display = 'flex';
+};
+window.ctClose = () => { document.getElementById('ctWrap').style.display = 'none'; };
+window.ctAdd = () => {
+  let max = 0;
+  STAFF.forEach(x => { const m = /^s(\d+)$/.exec(x.id); if (m) max = Math.max(max, +m[1]); });
+  Object.keys(CT).forEach(k => { const m = /^s(\d+)$/.exec(k); if (m) max = Math.max(max, +m[1]); });
+  Object.keys(STAFF_RAW).forEach(k => { const m = /^s(\d+)$/.exec(k); if (m) max = Math.max(max, +m[1]); });
+  const id = 's' + (max + 1);
+  document.getElementById('ctList').insertAdjacentHTML('beforeend',
+    ctRow({ id:id, name:'' }).replace('value="" data-nm', 'value="" data-nm placeholder="이름"'));
+  const rows = document.querySelectorAll('#ctList .ctrow');
+  const last = rows[rows.length-1];
+  last.setAttribute('data-new','1');
+  last.querySelector('[data-nm]').focus();
+};
+window.ctSave = async () => {
+  const err = document.getElementById('ctE');
+  const rows = Array.from(document.querySelectorAll('#ctList .ctrow'));
+  const contract = {}, staff = {};
+  let order = 0;
+  for (const row of rows){
+    const id   = row.getAttribute('data-id');
+    const name = row.querySelector('[data-nm]').value.trim();
+    const mode = row.querySelector('[data-mode]').value;
+    const hrsV = row.querySelector('[data-hr]').value.trim();
+    if (!name){ err.textContent = '이름이 비어 있는 줄이 있습니다'; return; }
+    if (mode && hrsV === ''){ err.textContent = esc(name)+' 의 기준 시간을 넣어주세요'; return; }
+    if (hrsV !== ''){
+      const h = parseFloat(hrsV);
+      if (isNaN(h) || h < 0 || h > 400){ err.textContent = esc(name)+' 의 시간이 이상합니다'; return; }
+      if (!mode){ err.textContent = esc(name)+' 의 구분(알바/직원)을 골라주세요'; return; }
+      contract[id] = { mode: mode, hours: h };
+    }
+    order += 1;
+    const old = STAFF.find(x => x.id === id) || {};
+    staff[id] = { name: name, init: (old.init || name.charAt(0)), order: order, active: true };
+  }
+  /* 이 화면에 없는 사람(퇴사자 등)은 원래 명단 그대로 둡니다 */
+  Object.keys(STAFF_RAW).forEach(k => { if (!staff[k]) staff[k] = STAFF_RAW[k]; });
+  try {
+    await set(ref(db,'schedule/staff'), staff);
+    await set(ref(db,'attendance/contract'), contract);
+    CT = contract; ctClose();
+  } catch(e){ err.textContent = '저장이 안 됐어요 — 인터넷을 확인해주세요'; }
+};
+
+/* 화면 모드 칠하기 */
+function paintMode(){
+  const b = document.getElementById('bossBtn');
+  b.classList.toggle('on', BOSS);
+  b.textContent = BOSS ? '원장 모드 끄기' : '👑 원장님';
+  const showBoss = BOSS ? '' : 'none';
+  ['.date-nav','.log-section','.staff-grid'].forEach(sel => {
+    const el = document.querySelector(sel); if (el) el.style.display = showBoss;
+  });
+  document.getElementById('xlBar').style.display = BOSS ? 'flex' : 'none';
+  document.getElementById('punchWrap').style.display = BOSS ? 'none' : '';
+  if (!BOSS) document.getElementById('missBox').style.display = 'none';
+}
+
+/* 짧게 뜨는 알림 — 기록 내용은 남기지 않습니다 */
+let toastT = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  if (toastT) clearTimeout(toastT);
+  toastT = setTimeout(()=>el.classList.remove('show'), 3600);
+}
+function stamp(kind){
+  const d = new Date();
+  return '✓ 기록되었습니다 · ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 '
+    + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' ' + kind;
+}
+
+/* ═══ 직원 화면 — 이름 고르기 + 찍기 버튼만 ═══ */
+function renderPunch(){
+  const box = document.getElementById('punchWrap');
+  if (BOSS){ box.innerHTML = ''; return; }
+  const me = STAFF.find(x => x.id === ME);
+  if (!me){
+    box.innerHTML = '<div class="punchcard"><div class="pick-ttl">누구신가요?</div>'
+      + '<div class="pick-grid">'
+      + STAFF.map(s => '<button onclick="pickMe(\''+s.id+'\')">'+esc(s.name)+'</button>').join('')
+      + '</div></div>';
+    return;
+  }
+  const rec = dayData[ME] || {};
+  const hasIn = !!rec.in, hasOut = !!rec.out, onB = isOnBreak(rec);
+  box.innerHTML = '<div class="punchcard">'
+    + '<div class="punch-who">오늘 근무</div>'
+    + '<div class="punch-name">'+esc(me.name)+'</div>'
+    + '<div class="punch-btns">'
+    + '<button class="pbtn in"  onclick="clockIn(\''+ME+'\')"  '+(hasIn?'disabled':'')+'>출근</button>'
+    + '<button class="pbtn out" onclick="clockOut(\''+ME+'\')" '+((!hasIn||hasOut||onB)?'disabled':'')+'>퇴근</button>'
+    + '<button class="pbtn bs"  onclick="breakStart(\''+ME+'\')" '+((!hasIn||hasOut||onB)?'disabled':'')+'>휴식 시작</button>'
+    + '<button class="pbtn be"  onclick="breakEnd(\''+ME+'\')"   '+(!onB?'disabled':'')+'>휴식 종료</button>'
+    + '</div>'
+    + '<button class="punch-swap" onclick="pickMe(null)">내가 아니에요 — 이름 다시 고르기</button>'
+    + '</div>';
+}
+
+var STAFF_RAW = {};
 onValue(ref(db, 'schedule/staff'), (snap) => {
   const v = snap.val();
+  STAFF_RAW = v || {};
   if (v && Object.keys(v).length) {
     STAFF = Object.keys(v).map(k => Object.assign({ id:k }, v[k]))
               .filter(s => s.active !== false)
@@ -349,7 +606,7 @@ function dateDisplay(d) {
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
 }
 function isToday(d) { return dateKey(d) === dateKey(new Date()); }
-window.changeDate = (delta) => { currentDate.setDate(currentDate.getDate() + delta); watchDay(); };
+window.changeDate = (delta) => { if(!BOSS) return; currentDate.setDate(currentDate.getDate() + delta); watchDay(); };
 window.goToday    = () => { currentDate = new Date(); watchDay(); };
 window.goDate     = (key) => { currentDate = new Date(key + 'T00:00:00'); watchDay(); };
 
@@ -383,7 +640,7 @@ window.clockIn = (staffId) => {
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].in    = nowHHMM();
   dayData[staffId].inLoc = locStamp();
-  saveRecord(staffId); renderAll();
+  saveRecord(staffId); renderAll(); toast(stamp('출근'));
 };
 
 /* 퇴근은 위치를 못 잡아도 허용 — 대신 위치 상태를 그대로 남깁니다 */
@@ -399,7 +656,7 @@ window.clockOut = (staffId) => {
   if (!dayData[staffId]) dayData[staffId] = {};
   dayData[staffId].out    = nowHHMM();
   dayData[staffId].outLoc = locStamp();
-  saveRecord(staffId); renderAll();
+  saveRecord(staffId); renderAll(); toast(stamp('퇴근'));
 };
 
 /* 지난 날짜 퇴근 시간 채워넣기 */
@@ -430,13 +687,13 @@ window.breakStart = (staffId) => {
   if (!dayData[staffId]) dayData[staffId] = {};
   if (!dayData[staffId].breaks) dayData[staffId].breaks = [];
   dayData[staffId].breaks.push({ start: nowHHMM(), end: null });
-  saveRecord(staffId); renderAll();
+  saveRecord(staffId); renderAll(); toast(stamp('휴식 시작'));
 };
 window.breakEnd = (staffId) => {
   const rec = dayData[staffId] || {};
   if (!isOnBreak(rec)) { alert('진행 중인 휴식이 없어요.'); return; }
   rec.breaks[rec.breaks.length - 1].end = nowHHMM();
-  saveRecord(staffId); renderAll();
+  saveRecord(staffId); renderAll(); toast(stamp('휴식 종료'));
 };
 function isOnBreak(rec) {
   if (!rec.breaks || !rec.breaks.length) return false;
@@ -456,7 +713,7 @@ window.saveMemo = (staffId, val) => {
   saveRecord(staffId);
 };
 window.pickMe = (staffId) => {
-  ME = (ME === staffId) ? null : staffId;
+  ME = (!staffId || ME === staffId) ? null : staffId;
   try { ME ? localStorage.setItem('laurel_me', ME) : localStorage.removeItem('laurel_me'); } catch(e) {}
   renderAll();
 };
@@ -502,7 +759,11 @@ function esc(v) {
 }
 
 /* ═══════ 그리기 ═══════ */
-function renderAll() { renderCards(); renderLog(); renderMissing(); }
+function renderAll() {
+  renderPunch();
+  if (!BOSS) return;          /* 직원 화면에는 기록을 그리지 않습니다 */
+  renderCards(); renderLog(); renderMissing();
+}
 
 function locText(rec) {
   const bits = [];
@@ -640,7 +901,7 @@ function loadMissing() {
 }
 function renderMissing() {
   const box = document.getElementById('missBox');
-  if (!MISS.length) { box.style.display = 'none'; return; }
+  if (!BOSS || !MISS.length) { box.style.display = 'none'; return; }
   box.style.display = '';
   const rows = MISS.slice(0, 8).map(m =>
     `<div class="mrow"><b>${esc(m.name)}</b> · ${esc(m.day.slice(5))} ${esc(m.in)} 출근` +
@@ -661,6 +922,227 @@ onValue(ref(db, '.info/connected'), (snap) => {
   else            { el.textContent = '🔴 오프라인 — 재연결 시도 중'; el.className = 'conn-status conn-err'; }
 });
 
+/* ═══════ 월별 엑셀 — 원장 모드 전용 ═══════ */
+function minOf(rec){ return actualMin(rec) ? (function(){
+  const t = actualMin(rec); return t; })() : null; }
+
+/* 그 달의 주(월~일) 목록 — 알바 주 기준 계산용 */
+function weekList(y, m){
+  const last = new Date(y, m+1, 0).getDate();
+  const out = []; let no = 0;
+  for (let d=1; d<=last; d++){
+    const dt = new Date(y, m, d);
+    if (d===1 || dt.getDay()===1){
+      no += 1;
+      out.push({ no:no, from:d, to:d });
+    } else { out[out.length-1].to = d; }
+  }
+  out.forEach(w => { w.label = w.no+'주차\n'+(m+1)+'/'+w.from+'~'+(m+1)+'/'+w.to; });
+  return out;
+}
+function weekNo(key){
+  const d = new Date(key+'T00:00:00');
+  const wl = weekList(d.getFullYear(), d.getMonth());
+  const day = d.getDate();
+  const hit = wl.find(w => day>=w.from && day<=w.to);
+  return hit ? hit.no : 1;
+}
+
+window.exportMonth = async function(){
+  if (!BOSS) return;
+  const btn = document.getElementById('xlBtn');
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ 만드는 중...';
+  try{
+    if (typeof ExcelJS === 'undefined') throw new Error('엑셀 라이브러리를 불러오지 못했습니다');
+    const wage = parseInt(document.getElementById('xlWage').value) || 0;
+    const y = currentDate.getFullYear(), m = currentDate.getMonth();
+    const mk = y + '-' + String(m+1).padStart(2,'0');
+    const days = new Date(y, m+1, 0).getDate();
+
+    /* 그 달 기록을 한 번에 읽어옵니다 */
+    const rows = [];
+    const totals = {};
+    for (let d=1; d<=days; d++){
+      const key = mk + '-' + String(d).padStart(2,'0');
+      let snap;
+      try { snap = await get(ref(db, 'attendance/' + key)); } catch(e){ continue; }
+      const v = (snap && snap.exists()) ? (snap.val()||{}) : {};
+      Object.keys(v).forEach(sid => {
+        const rec = v[sid] || {};
+        if (!rec.in && !rec.out) return;
+        const st = STAFF.find(x=>x.id===sid);
+        const name = st ? st.name : (LEGACY[sid] || sid);
+        const bMin = totalBreakMin(rec) || 0;
+        const aMin = (function(){
+          const inM = toMin(rec.in), outM = toMin(rec.out);
+          if (inM==null || outM==null) return null;
+          return Math.max(0, outM - inM - bMin);
+        })();
+        rows.push({ day:key, dow:['일','월','화','수','목','금','토'][new Date(key+'T00:00:00').getDay()],
+          name:name, inT:rec.in||'', outT:rec.out||'', bMin:bMin, aMin:aMin,
+          memo:rec.memo||'', loc:(rec.outLoc && rec.outLoc.ok===false) ? '매장 밖' : '' });
+        const T = totals[name] || (totals[name] = { id:sid, work:0, days:0, miss:0, wk:{} });
+        T.id = sid;
+        if (aMin!=null){
+          T.work += aMin; T.days += 1;
+          const wn = weekNo(key);
+          T.wk[wn] = (T.wk[wn]||0) + aMin;
+        } else { T.miss += 1; }
+      });
+    }
+
+    const wb = new ExcelJS.Workbook(); wb.creator='Laurel Studio';
+    const ws = wb.addWorksheet('근태_'+mk);
+    ws.views=[{showGridLines:false}];
+    ws.mergeCells('A1:H1');
+    const t = ws.getCell('A1');
+    t.value = 'Laurel Studio — 근태 기록 ' + y + '년 ' + (m+1) + '월';
+    t.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF3B2E2E'}};
+    t.font={bold:true,color:{argb:'FFFFFFFF'},size:14,name:'Arial'};
+    t.alignment={horizontal:'center',vertical:'middle'}; ws.getRow(1).height=30;
+
+    const H=['날짜','요일','이름','출근','퇴근','휴식','근무시간','비고'];
+    const W=[13,8,13,11,11,11,13,26];
+    H.forEach((h,i)=>{ const c=ws.getCell(String.fromCharCode(65+i)+'2'); c.value=h;
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF6B5344'}};
+      c.font={bold:true,color:{argb:'FFFFFFFF'},size:9,name:'Arial'};
+      c.alignment={horizontal:'center',vertical:'middle'};
+      ws.getColumn(i+1).width=W[i]; });
+    ws.getRow(2).height=20;
+
+    let r=3;
+    rows.sort((a,b)=> a.day===b.day ? a.name.localeCompare(b.name) : a.day.localeCompare(b.day));
+    rows.forEach(x=>{
+      const miss = (!x.outT);
+      const bg = miss ? 'FFFDECEC' : (r%2 ? 'FFFFFFFF' : 'FFFBF8F4');
+      const put=(col,val,bold)=>{ const c=ws.getCell(col+r); c.value=val==null?'':val;
+        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+        c.font={bold:!!bold,size:10,name:'Arial',color:{argb: miss?'FFB94040':'FF000000'}};
+        c.alignment={horizontal:'center',vertical:'middle'}; };
+      put('A', x.day.slice(5)); put('B', x.dow); put('C', x.name, true);
+      put('D', x.inT); put('E', x.outT || '미입력', miss);
+      put('F', x.bMin ? fmtMin(x.bMin) : '');
+      put('G', x.aMin==null ? '' : fmtMin(x.aMin), true);
+      const note = miss ? '퇴근 미입력 — 이 날은 합계에서 빠집니다' : '';
+      const c=ws.getCell('H'+r); c.value = [note, x.loc, x.memo].filter(Boolean).join(' · ');
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+      c.font={size:10,name:'Arial',color:{argb: miss?'FFB94040':'FF000000'}};
+      c.alignment={horizontal:'left',vertical:'middle'};
+      ws.getRow(r).height=17; r++;
+    });
+
+    /* 사람별 합계 */
+    r += 1;
+    function band(txt, span){
+      ws.mergeCells('A'+r+':'+String.fromCharCode(64+span)+r);
+      const c=ws.getCell('A'+r); c.value=txt;
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF3B2E2E'}};
+      c.font={bold:true,color:{argb:'FFC9A84C'},size:11,name:'Arial'};
+      c.alignment={horizontal:'center',vertical:'middle'}; ws.getRow(r).height=22; r++;
+    }
+    function head(cols){
+      cols.forEach((h,i)=>{ const c=ws.getCell(String.fromCharCode(65+i)+r); c.value=h;
+        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF6B5344'}};
+        c.font={bold:true,color:{argb:'FFFFFFFF'},size:9,name:'Arial'};
+        c.alignment={horizontal:'center',vertical:'middle',wrapText:true}; });
+      ws.getRow(r).height=20; r++;
+    }
+    function line(vals, opt){
+      vals.forEach((v,i)=>{ const c=ws.getCell(String.fromCharCode(65+i)+r);
+        c.value = (v===undefined?'':v);
+        const col = (opt && opt.colors && opt.colors[i]) || 'FF000000';
+        c.font={bold:!!(opt && opt.bold && opt.bold.indexOf(i)>=0),size:10,name:'Arial',color:{argb:col}};
+        c.alignment={horizontal:'center',vertical:'middle'};
+        if (opt && opt.money === i) c.numFmt='#,##0"원"'; });
+      ws.getRow(r).height=19; r++;
+    }
+    const names = Object.keys(totals).sort();
+    const monthly = names.filter(n => (CT[totals[n].id]||{}).mode === 'month');
+    const weekly  = names.filter(n => (CT[totals[n].id]||{}).mode === 'week');
+    const none    = names.filter(n => !(CT[totals[n].id]||{}).mode);
+    const diffTxt = d => (d===0 ? '0' : (d>0 ? '+'+fmtMin(d) : '-'+fmtMin(-d)));
+    const diffCol = d => d>0 ? 'FF8A4A2E' : (d<0 ? 'FF2F6B8A' : 'FF000000');
+
+    /* ── 직원 · 계약직 (월 기준) ── */
+    if (monthly.length){
+      band('👤 직원 · 계약직 — 월 기준', 6);
+      head(['이름','월 기준','이달 근무','차이','지급액(원)','퇴근 미입력']);
+      monthly.forEach(n=>{
+        const T=totals[n], base=Math.round((CT[T.id].hours||0)*60), d=T.work-base;
+        line([n, fmtMin(base), fmtMin(T.work)||'0', diffTxt(d),
+              wage?Math.round(T.work/60*wage):0, T.miss?(T.miss+'일'):''],
+             {bold:[0,2,3], money:4, colors:{3:diffCol(d), 5:T.miss?'FFB94040':'FF000000'}});
+      });
+      r++;
+    }
+
+    /* ── 알바 (주 기준) ── */
+    if (weekly.length){
+      const wks = weekList(y, m);
+      band('🕐 알바 — 주 기준', 3 + wks.length + 1);
+      head(['이름','주 기준','이달 합계'].concat(wks.map(w=>w.label)).concat(['퇴근 미입력']));
+      weekly.forEach(n=>{
+        const T=totals[n], base=Math.round((CT[T.id].hours||0)*60);
+        const cells=[n, fmtMin(base), fmtMin(T.work)||'0'];
+        const cols={};
+        wks.forEach((w,i)=>{
+          const got=T.wk[w.no]||0, d=got-base;
+          cells.push(fmtMin(got)||'0');
+          if (got||d) cols[3+i]=diffCol(d);
+        });
+        cells.push(T.miss?(T.miss+'일'):'');
+        cols[3+wks.length]=T.miss?'FFB94040':'FF000000';
+        line(cells,{bold:[0,2],colors:cols});
+        /* 주별 차이 줄 */
+        const dl=['','↳ 기준 대비',''];
+        const dc={1:'FF7A726A'};
+        wks.forEach((w,i)=>{ const got=T.wk[w.no]||0; const d=got-base;
+          dl.push(got?diffTxt(d):'—'); dc[3+i]=got?diffCol(d):'FFB9B2A8'; });
+        dl.push('');
+        line(dl,{colors:dc});
+      });
+      r++;
+    }
+
+    /* ── 기준 미설정 ── */
+    if (none.length){
+      band('기준 미설정 — ⚙ 계약 기준에서 넣어주세요', 5);
+      head(['이름','근무일수','이달 근무','지급액(원)','퇴근 미입력']);
+      none.forEach(n=>{ const T=totals[n];
+        line([n, T.days+'일', fmtMin(T.work)||'0', wage?Math.round(T.work/60*wage):0,
+              T.miss?(T.miss+'일'):''],
+             {bold:[0,2], money:3, colors:{4:T.miss?'FFB94040':'FF000000'}});
+      });
+      r++;
+    }
+
+    ws.mergeCells('A'+r+':H'+r);
+    const nc=ws.getCell('A'+r);
+    nc.value='※ 「차이」는 실제 근무시간에서 계약 기준을 뺀 값입니다. '
+           + '＋는 더 일한 시간, －는 덜 일한 시간(조기 퇴근·단축 운영 포함)입니다. '
+           + '퇴근을 안 찍은 날은 시간을 알 수 없어 합계에서 빠지며 맨 오른쪽에 일수로 표시됩니다 — '
+           + '원장 모드에서 그 날짜로 가 「퇴근 시각 직접 입력」으로 채워주세요.';
+    nc.font={size:9.5,name:'Arial',color:{argb:'FF7A726A'}};
+    nc.alignment={horizontal:'left',vertical:'middle',wrapText:true};
+    ws.getRow(r).height=32;
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='로렐_근태_'+mk+'.xlsx'; a.click();
+    URL.revokeObjectURL(url);
+    btn.textContent='✅ 받았습니다';
+    setTimeout(()=>{ btn.textContent=old; btn.disabled=false; }, 2200);
+  } catch(e){
+    console.error(e);
+    alert('엑셀을 만들지 못했습니다 — 인터넷을 확인하고 다시 눌러주세요');
+    btn.textContent=old; btn.disabled=false;
+  }
+};
+
+paintMode();
 watchDay();
 </script>
 </body>
